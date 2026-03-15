@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=simple
 User=utg
 WorkingDirectory=/opt/utg-server
-ExecStart=/usr/bin/node server.js
+ExecStart=/usr/local/bin/node server.js
 Restart=always
 RestartSec=5
 Environment=NODE_ENV=production

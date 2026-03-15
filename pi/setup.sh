@@ -30,8 +30,17 @@ sudo apt-get upgrade -y -qq
 # ---------------------------------------------------------------------------
 echo ">>> Installing Node.js ${NODE_MAJOR}..."
 if ! command -v node &>/dev/null || [[ "$(node -v | cut -d. -f1 | tr -d v)" -lt "$NODE_MAJOR" ]]; then
-  curl -fsSL https://deb.nodesource.com/setup_${NODE_MAJOR}.x | sudo -E bash -
-  sudo apt-get install -y -qq nodejs
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "armv7l" ] || [ "$(dpkg --print-architecture)" = "armhf" ]; then
+    NODE_ARCH="armv7l"
+  elif [ "$ARCH" = "aarch64" ]; then
+    NODE_ARCH="arm64"
+  else
+    NODE_ARCH="x64"
+  fi
+  NODE_VER="v${NODE_MAJOR}.16.0"
+  echo "    Downloading Node.js ${NODE_VER} for ${NODE_ARCH}..."
+  curl -fsSL "https://nodejs.org/dist/${NODE_VER}/node-${NODE_VER}-linux-${NODE_ARCH}.tar.xz" | sudo tar -xJ -C /usr/local --strip-components=1
 fi
 echo "    Node $(node -v), npm $(npm -v)"
 
