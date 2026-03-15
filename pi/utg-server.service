@@ -1,0 +1,26 @@
+[Unit]
+Description=Under the Glass High Score Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=utg
+WorkingDirectory=/opt/utg-server
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=utg-server
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/utg-server/data
+
+[Install]
+WantedBy=multi-user.target

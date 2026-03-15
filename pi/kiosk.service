@@ -1,0 +1,16 @@
+[Unit]
+Description=Under the Glass Kiosk (Chromium fullscreen)
+After=utg-server.service
+Wants=utg-server.service
+After=network-online.target
+
+[Service]
+Type=simple
+User=utg
+ExecStart=/usr/local/bin/utg-kiosk.sh
+Restart=always
+RestartSec=10
+Environment=DISPLAY=:0
+
+[Install]
+WantedBy=graphical.target
