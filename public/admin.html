@@ -240,6 +240,101 @@ body{
 .toast.show{display:block;animation:fadeUp .3s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
+/* --------------------------------------------------------- settings panel */
+.settings-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;z-index:300;
+}
+.settings-panel{
+  background:#161b22;border:1px solid #30363d;border-radius:12px;
+  padding:2rem;width:520px;max-width:95%;max-height:85vh;overflow-y:auto;
+}
+.settings-panel::-webkit-scrollbar{width:4px}
+.settings-panel::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
+.settings-panel h2{
+  font-size:1.2rem;color:#e6edf3;letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:1.5rem;display:flex;align-items:center;gap:.5rem;
+}
+.settings-panel h3{
+  font-size:.85rem;color:#8b949e;letter-spacing:.12em;text-transform:uppercase;
+  margin:1.5rem 0 .8rem;border-bottom:1px solid #21262d;padding-bottom:.4rem;
+}
+.settings-close{
+  margin-left:auto;background:none;border:none;color:#8b949e;font-size:1.3rem;
+  cursor:pointer;padding:.2rem .5rem;border-radius:4px;
+}
+.settings-close:hover{color:#e6edf3;background:#21262d}
+.settings-btn{
+  background:none;border:1px solid #30363d;border-radius:6px;
+  color:#8b949e;font-family:inherit;font-size:.8rem;letter-spacing:.08em;
+  cursor:pointer;padding:.4rem .8rem;display:flex;align-items:center;gap:.4rem;
+}
+.settings-btn:hover{color:#e6edf3;border-color:#58a6ff}
+
+/* wifi status */
+.wifi-status{
+  background:#0d1117;border:1px solid #21262d;border-radius:8px;
+  padding:1rem 1.2rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem .8rem;
+}
+.wifi-status .ws-label{font-size:.65rem;color:#484f58;letter-spacing:.1em;text-transform:uppercase}
+.wifi-status .ws-value{font-size:.9rem;color:#e6edf3;letter-spacing:.04em}
+
+/* wifi network list */
+.wifi-list{list-style:none;padding:0}
+.wifi-net{
+  display:flex;align-items:center;gap:.8rem;
+  padding:.6rem .8rem;border-radius:6px;cursor:pointer;
+  border:1px solid transparent;transition:all .12s;
+}
+.wifi-net:hover{background:#21262d;border-color:#30363d}
+.wifi-net .wn-ssid{flex:1;font-size:.9rem;color:#e6edf3}
+.wifi-net .wn-signal{font-size:.75rem;color:#8b949e;min-width:40px;text-align:right}
+.wifi-net .wn-security{font-size:.6rem;color:#484f58;letter-spacing:.08em;min-width:50px}
+.wifi-net .wn-bars{display:flex;gap:2px;align-items:flex-end}
+.wifi-net .wn-bars span{
+  width:4px;background:#30363d;border-radius:1px;
+}
+.wifi-net .wn-bars span.active{background:#3fb950}
+
+/* saved networks */
+.saved-net{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.5rem .8rem;border-bottom:1px solid #21262d;
+}
+.saved-net:last-child{border-bottom:none}
+.saved-net .sn-name{font-size:.85rem;color:#e6edf3}
+.saved-net .sn-forget{
+  background:none;border:none;color:#484f58;cursor:pointer;font-size:.7rem;
+  letter-spacing:.08em;padding:.2rem .5rem;border-radius:4px;
+}
+.saved-net .sn-forget:hover{color:#f85149;background:rgba(248,81,73,.1)}
+
+/* system info */
+.sys-info{
+  background:#0d1117;border:1px solid #21262d;border-radius:8px;
+  padding:1rem 1.2rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem .8rem;
+}
+.sys-info .si-label{font-size:.65rem;color:#484f58;letter-spacing:.1em;text-transform:uppercase}
+.sys-info .si-value{font-size:.9rem;color:#e6edf3;letter-spacing:.04em}
+
+/* wifi password modal */
+.wifi-pw-modal{
+  background:#0d1117;border:1px solid #30363d;border-radius:8px;
+  padding:1rem 1.2rem;margin-top:.8rem;
+}
+.wifi-pw-modal label{
+  display:block;font-size:.65rem;color:#8b949e;letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:.3rem;
+}
+.wifi-pw-modal input{
+  width:100%;padding:.5rem .8rem;background:#161b22;border:1px solid #30363d;
+  border-radius:6px;color:#e6edf3;font-family:'Roboto Mono',monospace;font-size:.9rem;
+  margin-bottom:.6rem;
+}
+.wifi-pw-modal input:focus{border-color:#58a6ff;outline:none}
+.wifi-pw-actions{display:flex;gap:.5rem;justify-content:flex-end}
+.scan-spinner{color:#484f58;font-size:.75rem;letter-spacing:.08em;padding:.5rem 0}
+
 /* --------------------------------------------------------- add score modal */
 .modal-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.7);
@@ -288,6 +383,7 @@ body{
     <h1>Score Editor</h1>
   </div>
   <a href="/">← Back to Dashboard</a>
+  <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
 </div>
 
 <!-- Split Layout -->
@@ -701,6 +797,192 @@ function showToast(msg, isError = false) {
   t.className = 'toast show' + (isError ? ' error' : '');
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.className = 'toast', 2500);
+}
+// ── Settings / WiFi ──────────────────────────────────────────────────────
+
+function signalBars(pct) {
+  const levels = [20, 40, 60, 80];
+  return levels.map((thresh, i) => {
+    const h = 4 + i * 4;
+    const active = pct >= thresh ? 'active' : '';
+    return `<span class="${active}" style="height:${h}px"></span>`;
+  }).join('');
+}
+
+async function openSettings() {
+  const overlay = document.createElement('div');
+  overlay.className = 'settings-overlay';
+  overlay.innerHTML = `
+    <div class="settings-panel">
+      <h2>⚙️ Settings <button class="settings-close" onclick="this.closest('.settings-overlay').remove()">✕</button></h2>
+
+      <h3>📶 WiFi Status</h3>
+      <div class="wifi-status" id="wifiStatus">
+        <div class="ws-label">Loading...</div>
+      </div>
+
+      <h3>📡 Available Networks <button class="btn btn-secondary" style="margin-left:auto;font-size:.7rem;padding:.3rem .6rem" onclick="scanWifi()">🔄 Scan</button></h3>
+      <div id="wifiScanResults"><div class="scan-spinner">Click Scan to discover networks...</div></div>
+
+      <div id="wifiPasswordArea"></div>
+
+      <h3>💾 Saved Networks</h3>
+      <div id="savedNetworks"><div class="scan-spinner">Loading...</div></div>
+
+      <h3>🖥️ System Info</h3>
+      <div class="sys-info" id="sysInfo">
+        <div class="si-label">Loading...</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  loadWifiStatus();
+  loadSavedNetworks();
+  loadSystemInfo();
+}
+
+async function loadWifiStatus() {
+  const el = document.getElementById('wifiStatus');
+  if (!el) return;
+  try {
+    const resp = await fetch('/api/wifi/status');
+    const data = await resp.json();
+    el.innerHTML = `
+      <div class="ws-label">SSID</div><div class="ws-value">${data.ssid || 'N/A'}</div>
+      <div class="ws-label">IP Address</div><div class="ws-value">${data.ip || 'N/A'}</div>
+      <div class="ws-label">Signal</div><div class="ws-value">${data.signal || 'N/A'}</div>
+      <div class="ws-label">Hostname</div><div class="ws-value">${data.hostname || 'N/A'}</div>
+    `;
+  } catch {
+    el.innerHTML = '<div class="ws-label">Error</div><div class="ws-value">Could not load WiFi status</div>';
+  }
+}
+
+async function scanWifi() {
+  const el = document.getElementById('wifiScanResults');
+  if (!el) return;
+  el.innerHTML = '<div class="scan-spinner">Scanning...</div>';
+  try {
+    const resp = await fetch('/api/wifi/scan');
+    const networks = await resp.json();
+    if (!Array.isArray(networks) || networks.length === 0) {
+      el.innerHTML = '<div class="scan-spinner">No networks found</div>';
+      return;
+    }
+    const list = document.createElement('ul');
+    list.className = 'wifi-list';
+    for (const net of networks) {
+      const li = document.createElement('li');
+      li.className = 'wifi-net';
+      li.innerHTML = `
+        <div class="wn-bars">${signalBars(net.signal)}</div>
+        <div class="wn-ssid">${net.ssid}</div>
+        <div class="wn-security">${net.security || 'Open'}</div>
+        <div class="wn-signal">${net.signal}%</div>
+      `;
+      li.onclick = () => showWifiPassword(net.ssid, net.security);
+      list.appendChild(li);
+    }
+    el.innerHTML = '';
+    el.appendChild(list);
+  } catch (e) {
+    el.innerHTML = `<div class="scan-spinner">Scan failed: ${e.message}</div>`;
+  }
+}
+
+function showWifiPassword(ssid, security) {
+  const area = document.getElementById('wifiPasswordArea');
+  if (!area) return;
+  const needsPw = security && security !== 'Open' && security !== '--';
+  area.innerHTML = `
+    <div class="wifi-pw-modal">
+      <label>Connect to: <strong>${ssid}</strong></label>
+      ${needsPw ? '<label style="margin-top:.5rem">Password</label><input type="password" id="wifiPwInput" placeholder="Network password" autofocus>' : ''}
+      <div class="wifi-pw-actions">
+        <button class="btn btn-secondary" onclick="document.getElementById('wifiPasswordArea').innerHTML=''">Cancel</button>
+        <button class="btn btn-primary" onclick="connectWifi('${ssid.replace(/'/g, "\\'")}')">Connect</button>
+      </div>
+    </div>
+  `;
+  if (needsPw) document.getElementById('wifiPwInput')?.focus();
+}
+
+async function connectWifi(ssid) {
+  const pwInput = document.getElementById('wifiPwInput');
+  const password = pwInput ? pwInput.value : '';
+  const area = document.getElementById('wifiPasswordArea');
+
+  try {
+    if (area) area.innerHTML = '<div class="scan-spinner">Connecting...</div>';
+    const resp = await fetch('/api/wifi/connect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ssid, password }),
+    });
+    const data = await resp.json();
+    if (resp.ok) {
+      if (area) area.innerHTML = '';
+      showToast(`Connected to ${ssid} (${data.ip})`);
+      loadWifiStatus();
+      loadSavedNetworks();
+    } else {
+      showToast(data.error || 'Connection failed', true);
+      if (area) area.innerHTML = '';
+    }
+  } catch (e) {
+    showToast('Connection error: ' + e.message, true);
+    if (area) area.innerHTML = '';
+  }
+}
+
+async function loadSavedNetworks() {
+  const el = document.getElementById('savedNetworks');
+  if (!el) return;
+  try {
+    const resp = await fetch('/api/wifi/saved');
+    const networks = await resp.json();
+    if (!Array.isArray(networks) || networks.length === 0) {
+      el.innerHTML = '<div class="scan-spinner">No saved networks</div>';
+      return;
+    }
+    el.innerHTML = networks.map(n => `
+      <div class="saved-net">
+        <span class="sn-name">${n}</span>
+        <button class="sn-forget" onclick="forgetNetwork('${n.replace(/'/g, "\\'")}')">Forget</button>
+      </div>
+    `).join('');
+  } catch {
+    el.innerHTML = '<div class="scan-spinner">Could not load saved networks</div>';
+  }
+}
+
+async function forgetNetwork(ssid) {
+  try {
+    await fetch('/api/wifi/' + encodeURIComponent(ssid), { method: 'DELETE' });
+    showToast(`Forgot ${ssid}`);
+    loadSavedNetworks();
+  } catch (e) {
+    showToast('Error: ' + e.message, true);
+  }
+}
+
+async function loadSystemInfo() {
+  const el = document.getElementById('sysInfo');
+  if (!el) return;
+  try {
+    const resp = await fetch('/api/system');
+    const data = await resp.json();
+    el.innerHTML = `
+      <div class="si-label">Uptime</div><div class="si-value">${data.uptime || 'N/A'}</div>
+      <div class="si-label">Temperature</div><div class="si-value">${data.temperature || 'N/A'}</div>
+      <div class="si-label">Memory</div><div class="si-value">${data.memory || 'N/A'}</div>
+      <div class="si-label">Node.js</div><div class="si-value">${data.nodeVersion || 'N/A'}</div>
+    `;
+  } catch {
+    el.innerHTML = '<div class="si-label">Error</div><div class="si-value">Could not load system info</div>';
+  }
 }
 </script>
 </body>
