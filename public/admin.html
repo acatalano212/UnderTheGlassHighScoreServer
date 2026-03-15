@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UTG Admin – Score Editor</title>
+<link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{
+  font-family:'Oswald','Impact','Arial Narrow',sans-serif;
+  background:#0d1117;
+  color:#ccc;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* ---------------------------------------------------------------- header */
+.header{
+  width:100%;height:56px;
+  background:linear-gradient(180deg,#161b22 0%,#0d1117 100%);
+  border-bottom:2px solid rgba(255,255,255,.06);
+  padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.header-brand{display:flex;align-items:center;gap:.6rem}
+.header-brand img{height:36px;object-fit:contain}
+.header h1{font-size:1.2rem;letter-spacing:.15em;text-transform:uppercase;color:#e6edf3}
+.header a{color:#58a6ff;text-decoration:none;font-size:.85rem;letter-spacing:.1em}
+.header a:hover{text-decoration:underline}
+
+/* --------------------------------------------------------- auth overlay */
+.auth-gate{
+  position:fixed;inset:0;background:rgba(0,0,0,.85);
+  display:flex;align-items:center;justify-content:center;z-index:999;
+}
+.auth-box{
+  background:#161b22;border:1px solid #30363d;border-radius:12px;
+  padding:2.5rem;text-align:center;max-width:380px;width:90%;
+}
+.auth-box h2{font-size:1.4rem;color:#e6edf3;margin-bottom:1rem;letter-spacing:.1em}
+.auth-box input{
+  width:100%;padding:.7rem 1rem;background:#0d1117;border:1px solid #30363d;
+  border-radius:6px;color:#e6edf3;font-family:inherit;font-size:1rem;
+  margin-bottom:1rem;text-align:center;letter-spacing:.15em;
+}
+.auth-box button{
+  width:100%;padding:.7rem;background:#238636;border:none;border-radius:6px;
+  color:#fff;font-family:inherit;font-size:1rem;font-weight:600;
+  letter-spacing:.1em;cursor:pointer;
+}
+.auth-box button:hover{background:#2ea043}
+.auth-box .error{color:#f85149;font-size:.85rem;margin-top:.5rem}
+
+/* ------------------------------------------------------ layout */
+.main{
+  display:flex;
+  height:calc(100vh - 58px);
+}
+
+/* ----- sidebar (desktop) ----- */
+.sidebar{
+  width:280px;min-width:280px;
+  background:#0d1117;
+  border-right:1px solid #21262d;
+  overflow-y:auto;
+  padding:.5rem 0;
+}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
+
+.sidebar-label{
+  font-size:.65rem;color:#484f58;letter-spacing:.15em;text-transform:uppercase;
+  padding:.8rem 1rem .3rem;
+}
+
+.game-item{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.55rem 1rem;cursor:pointer;
+  border-left:3px solid transparent;
+  transition:all .12s;
+}
+.game-item:hover{background:#161b22}
+.game-item.active{background:#161b22;border-left-color:#58a6ff}
+.game-item.stern{opacity:.35;pointer-events:none}
+
+.game-item .gi-logo{
+  width:36px;height:36px;border-radius:6px;object-fit:contain;
+  background:rgba(0,0,0,.4);flex-shrink:0;
+}
+.game-item .gi-fallback{
+  width:36px;height:36px;border-radius:6px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;color:#fff;
+}
+.game-item .gi-info{overflow:hidden}
+.game-item .gi-name{
+  font-size:.85rem;font-weight:600;color:#e6edf3;letter-spacing:.05em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.game-item .gi-sub{
+  font-size:.6rem;color:#484f58;letter-spacing:.06em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.game-item .gi-badge{
+  margin-left:auto;font-size:.55rem;color:#484f58;letter-spacing:.1em;
+  flex-shrink:0;
+}
+
+/* ----- game selector (mobile only) ----- */
+.game-selector{
+  display:none;
+  width:100%;max-width:650px;margin-bottom:1.5rem;
+}
+.game-selector label{
+  font-size:.65rem;color:#8b949e;letter-spacing:.15em;text-transform:uppercase;
+  display:block;margin-bottom:.4rem;
+}
+.game-selector select{
+  width:100%;padding:.6rem 1rem;background:#161b22;border:1px solid #30363d;
+  border-radius:6px;color:#e6edf3;font-family:'Oswald',sans-serif;font-size:1rem;
+  letter-spacing:.05em;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 1rem center;
+}
+.game-selector select:focus{border-color:#58a6ff;outline:none}
+.game-selector select option{background:#0d1117;color:#e6edf3}
+
+/* ----- editor panel ----- */
+.editor-panel{
+  flex:1;overflow-y:auto;padding:2rem 3rem;
+  display:flex;flex-direction:column;align-items:center;
+}
+.editor-panel::-webkit-scrollbar{width:6px}
+.editor-panel::-webkit-scrollbar-thumb{background:#30363d;border-radius:4px}
+
+@media(max-width:900px){
+  .main{flex-direction:column;overflow-y:auto}
+  .sidebar{display:none}
+  .game-selector{display:block}
+  .editor-panel{padding:1rem;overflow-y:visible}
+}
+
+.empty-state{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  color:#30363d;font-size:1.2rem;letter-spacing:.1em;
+}
+
+.editor-header{
+  position:relative;
+  display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;
+  width:100%;max-width:650px;
+  height:120px;
+  border-radius:10px;overflow:hidden;
+  padding:0 1.5rem;
+}
+.editor-header .eh-bg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+}
+.editor-header .eh-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.45) 50%,rgba(0,0,0,.7) 100%);
+}
+.editor-header .eh-content{
+  position:relative;z-index:1;
+  display:flex;align-items:center;gap:1rem;width:100%;
+}
+.editor-header .eh-logo{height:64px;border-radius:8px;object-fit:contain;
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
+}
+.editor-header .eh-fallback{
+  width:64px;height:64px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;font-weight:700;color:#fff;
+}
+.editor-header .eh-text h2{
+  font-size:1.3rem;color:#e6edf3;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;text-shadow:0 2px 8px rgba(0,0,0,.7);
+}
+.editor-header .eh-text p{font-size:.75rem;color:rgba(255,255,255,.8);letter-spacing:.06em;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+
+.score-table{width:100%;max-width:650px;border-collapse:separate;border-spacing:0 4px}
+.score-table th{
+  font-size:.7rem;color:#8b949e;letter-spacing:.12em;text-transform:uppercase;
+  text-align:left;padding:.4rem .6rem;
+}
+.score-table th:last-child{text-align:center}
+.score-row td{
+  background:#161b22;padding:.5rem .6rem;
+  border-top:1px solid #21262d;border-bottom:1px solid #21262d;
+}
+.score-row td:first-child{border-left:1px solid #21262d;border-radius:6px 0 0 6px}
+.score-row td:last-child{border-right:1px solid #21262d;border-radius:0 6px 6px 0;text-align:center}
+.score-row .rank{
+  width:32px;height:32px;border-radius:50%;display:inline-flex;
+  align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#fff;
+}
+.score-row input{
+  background:transparent;border:1px solid transparent;border-radius:4px;
+  color:#e6edf3;font-family:'Roboto Mono',monospace;font-size:.9rem;
+  padding:.3rem .5rem;width:100%;
+}
+.score-row input:hover{border-color:#30363d}
+.score-row input:focus{border-color:#58a6ff;outline:none;background:#0d1117}
+.score-row input.name-input{font-family:'Oswald',sans-serif;font-size:.95rem;text-transform:uppercase}
+.score-row input.score-input{text-align:right}
+.score-row .delete-btn{
+  background:none;border:none;color:#484f58;cursor:pointer;font-size:1.1rem;
+  padding:.2rem .4rem;border-radius:4px;
+}
+.score-row .delete-btn:hover{color:#f85149;background:rgba(248,81,73,.1)}
+
+.actions{
+  display:flex;gap:.8rem;justify-content:center;margin-top:1.5rem;
+  width:100%;max-width:650px;
+}
+.btn{
+  padding:.6rem 1.5rem;border:none;border-radius:6px;font-family:inherit;
+  font-size:.9rem;font-weight:600;letter-spacing:.08em;cursor:pointer;
+  display:inline-flex;align-items:center;gap:.4rem;
+}
+.btn-primary{background:#238636;color:#fff}
+.btn-primary:hover{background:#2ea043}
+.btn-secondary{background:#21262d;color:#c9d1d9;border:1px solid #30363d}
+.btn-secondary:hover{background:#30363d}
+
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+  background:#238636;color:#fff;padding:.7rem 1.5rem;border-radius:8px;
+  font-size:.9rem;letter-spacing:.08em;z-index:100;display:none;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+.toast.error{background:#da3633}
+.toast.show{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* --------------------------------------------------------- add score modal */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;z-index:200;
+}
+.modal-box{
+  background:#161b22;border:1px solid #30363d;border-radius:12px;
+  padding:2rem;width:340px;max-width:90%;
+}
+.modal-box h3{
+  font-size:1.1rem;color:#e6edf3;letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:1.2rem;text-align:center;
+}
+.modal-box label{
+  display:block;font-size:.7rem;color:#8b949e;letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:.3rem;
+}
+.modal-box input{
+  width:100%;padding:.6rem .8rem;background:#0d1117;border:1px solid #30363d;
+  border-radius:6px;color:#e6edf3;font-family:'Oswald',sans-serif;font-size:1rem;
+  letter-spacing:.08em;margin-bottom:1rem;
+}
+.modal-box input:focus{border-color:#58a6ff;outline:none}
+.modal-box input.score-field{font-family:'Roboto Mono',monospace;text-align:right}
+.modal-actions{
+  display:flex;gap:.6rem;justify-content:flex-end;margin-top:.5rem;
+}
+</style>
+</head>
+<body>
+
+<!-- Auth Gate -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
+    <h2>🔑 Admin Access</h2>
+    <input type="password" id="apiKeyInput" placeholder="Enter Password" autofocus>
+    <button onclick="authenticate()">Unlock</button>
+    <div class="error" id="authError"></div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-brand">
+    <img src="static/utg-logo.png" alt="UTG">
+    <h1>Score Editor</h1>
+  </div>
+  <a href="/">← Back to Dashboard</a>
+</div>
+
+<!-- Split Layout -->
+<div class="main">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="game-selector" id="gameSelector">
+    <label>Select Game</label>
+    <select id="gameDropdown" onchange="onGameSelect(this.value)">
+      <option value="">— Choose a game —</option>
+    </select>
+  </div>
+  <div class="editor-panel" id="editorPanel">
+    <div class="empty-state">← Select a game to edit scores</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// Game logos — mirrors JJP_ASSETS from dashboard
+const GAME_LOGOS = {
+  'jjp-hp-we':       'static/hp-logo.png',
+  'jjp-hp-ce':       'static/hp-logo.png',
+  'jjp-avatar':      'static/avatar-logo.png',
+  'jjp-godfather':   'static/godfather-logo.png',
+  'jjp-toystory4':   'static/toystory-logo.webp',
+  'jjp-eltonjohn':   'static/eltonjohn-logo.webp',
+  'jjp-potc':        'static/potc-logo.webp',
+  'jjp-gnr':         'static/gnr-logo.webp',
+  'bof-wmh':         'static/wmh-logo.png',
+  'spooky-bj':       'static/beetlejuice-logo.png',
+  'stern-dnd':       'static/dnd-logo.webp',
+  'stern-pokemon':   'static/pokemon-logo.webp',
+  'cgc-mm':          'static/medievalmadness-logo.png',
+  'bof-dune':        'static/dune-logo.webp',
+  'stern-metallica': 'static/metallica-logo.webp',
+  'stern-godzilla':  'static/godzilla-logo.webp',
+  'stern-jaws':      'static/jaws-logo.webp',
+};
+
+const GAME_BANNERS = {
+  'jjp-hp-we':       'static/hp-banner.jpg',
+  'jjp-hp-ce':       'static/hpce-banner.jpg',
+  'jjp-avatar':      'static/avatar-banner.webp',
+  'jjp-godfather':   'static/godfather-banner.jpg',
+  'jjp-toystory4':   'static/toystory-banner.jpg',
+  'jjp-eltonjohn':   'static/eltonjohn-banner.jpg',
+  'jjp-potc':        'static/potc-banner.jpg',
+  'jjp-gnr':         'static/gnr-banner.jpg',
+  'bof-wmh':         'static/wmh-banner.avif',
+  'spooky-bj':       'static/beetlejuice-banner.jpg',
+  'stern-dnd':       'static/dnd-banner.webp',
+  'stern-pokemon':   'static/pokemon-banner.webp',
+  'cgc-mm':          'static/medievalmadness-banner.jpg',
+  'bof-dune':        'static/dune-banner.png',
+  'stern-metallica': 'static/metallica-banner.webp',
+  'stern-godzilla':  'static/godzilla-banner.webp',
+  'stern-jaws':      'static/jaws-banner.webp',
+};
+
+const GAME_THEMES = {
+  'jjp-hp-we':       { colors: ['#740001','#ae0001','#eeba30','#1a472a','#2a623d','#222f5b','#5d5d5d'] },
+  'jjp-hp-ce':       { colors: ['#740001','#ae0001','#eeba30','#1a472a','#2a623d','#222f5b','#5d5d5d'] },
+  'jjp-avatar':      { colors: ['#0077b6','#00b4d8','#2d6a4f','#40916c','#52b788','#90e0ef','#74c69d'] },
+  'jjp-godfather':   { colors: ['#1a1a2e','#16213e','#533e2d','#8b7355','#c9a96e','#4a3728','#2c1810'] },
+  'jjp-toystory4':   { colors: ['#1e81b0','#e28743','#76b5c5','#abdbe3','#154c79','#873e23','#eab676'] },
+  'jjp-eltonjohn':   { colors: ['#ff006e','#8338ec','#3a86ff','#fb5607','#ffbe0b','#06d6a0','#e500a4'] },
+  'jjp-potc':        { colors: ['#5c3d2e','#8b6914','#1a3c34','#2e1a0e','#c9a96e','#4a6741','#8b7355'] },
+  'jjp-gnr':         { colors: ['#cc0000','#ff4500','#ffd700','#333333','#8b0000','#ff6347','#daa520'] },
+  'bof-wmh':         { colors: ['#4a0e4e','#2d1b69','#1a1a2e','#7b2d8e','#9b59b6','#3e1f47','#6a1b9a'] },
+  'spooky-bj':       { colors: ['#4a0e4e','#1a472a','#2d1b69','#7b2d8e','#3e8948','#9b59b6','#6a1b9a'] },
+  'stern-dnd':       { colors: ['#8b0000','#4a0e4e','#1a472a','#c9a96e','#2d1b69','#8b6914','#533e2d'] },
+  'stern-pokemon':   { colors: ['#ffbe0b','#fb5607','#ff006e','#3a86ff','#8338ec','#06d6a0','#ef476f'] },
+  'cgc-mm':          { colors: ['#1a472a','#8b6914','#4a0e4e','#c9a96e','#2d6a4f','#8b0000','#533e2d'] },
+  'bof-dune':        { colors: ['#c2a366','#8b6914','#4a3728','#1a1a2e','#daa520','#5c3d2e','#2c1810'] },
+  'stern-metallica': { colors: ['#1a1a2e','#333','#0077b6','#555','#16213e','#777','#2c3e50'] },
+  'stern-godzilla':  { colors: ['#1a472a','#2d6a4f','#0077b6','#16213e','#40916c','#154c79','#1a1a2e'] },
+  'stern-jaws':      { colors: ['#0077b6','#154c79','#1a3c34','#16213e','#00b4d8','#2c3e50','#1a1a2e'] },
+};
+const DEFAULT_THEME = { colors: ['#888','#aaa','#666','#999','#777','#bbb','#555'] };
+
+let apiKey = '';
+let allGames = {};
+let selectedGame = null;
+
+function getInitials(name) {
+  if (!name) return '??';
+  const parts = name.trim().split(/[\s._-]+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  return name.substring(0, 2).toUpperCase();
+}
+function formatScore(n) { return Number(n).toLocaleString('en-US'); }
+function parseScoreInput(str) { return parseInt(String(str).replace(/[^0-9]/g, '')) || 0; }
+
+function logoHtml(key, name, size, rClass, fallbackLogo) {
+  const logo = GAME_LOGOS[key] || fallbackLogo;
+  const theme = GAME_THEMES[key] || DEFAULT_THEME;
+  if (logo) return `<img class="${rClass}" src="${logo}" alt="" style="width:${size}px;height:${size}px">`;
+  return `<div class="${rClass}" style="width:${size}px;height:${size}px;background:${theme.colors[0]}">${getInitials(name)}</div>`;
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────
+
+const ADMIN_PASS = 'utghs';
+const API_KEY = 'utg-xiao-bridge-2026';
+
+function authenticate() {
+  const pw = document.getElementById('apiKeyInput').value.trim();
+  if (!pw) { document.getElementById('authError').textContent = 'Please enter the password'; return; }
+  if (pw !== ADMIN_PASS) { document.getElementById('authError').textContent = 'Wrong password'; return; }
+  apiKey = API_KEY;
+  document.getElementById('authGate').style.display = 'none';
+  sessionStorage.setItem('utg_auth', 'ok');
+  loadGames();
+}
+
+document.getElementById('apiKeyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') authenticate();
+});
+
+if (sessionStorage.getItem('utg_auth') === 'ok') {
+  apiKey = API_KEY;
+  document.getElementById('authGate').style.display = 'none';
+  loadGames();
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────
+
+async function loadGames() {
+  try {
+    const resp = await fetch('/api/scores');
+    if (!resp.ok) return false;
+    const data = await resp.json();
+    allGames = data.games || {};
+    renderSidebar();
+    renderGameSelector();
+    return true;
+  } catch { return false; }
+}
+
+// ── Sidebar (desktop) ─────────────────────────────────────────────────────
+
+function renderSidebar() {
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+
+  const entries = Object.entries(allGames).sort((a, b) => {
+    const aS = a[1].source === 'stern' ? 1 : 0;
+    const bS = b[1].source === 'stern' ? 1 : 0;
+    if (aS !== bS) return aS - bS;
+    return (a[1].display_name || '').localeCompare(b[1].display_name || '');
+  });
+
+  let lastSection = '';
+  for (const [key, game] of entries) {
+    const isStern = game.source === 'stern';
+    const section = isStern ? 'stern' : 'editable';
+
+    if (section !== lastSection) {
+      const lbl = document.createElement('div');
+      lbl.className = 'sidebar-label';
+      lbl.textContent = isStern ? 'STERN API (READ-ONLY)' : 'EDITABLE GAMES';
+      sb.appendChild(lbl);
+      lastSection = section;
+    }
+
+    const item = document.createElement('div');
+    item.className = 'game-item' + (isStern ? ' stern' : '') + (selectedGame === key ? ' active' : '');
+
+    const sub = [game.manufacturer || '', game.edition || ''].filter(Boolean).join(' · ');
+    const gameLogo = GAME_LOGOS[key] || game.square_logo;
+    item.innerHTML = `
+      ${logoHtml(key, game.display_name, 36, gameLogo ? 'gi-logo' : 'gi-fallback', game.square_logo)}
+      <div class="gi-info">
+        <div class="gi-name">${game.display_name}</div>
+        <div class="gi-sub">${sub}</div>
+      </div>
+      ${isStern ? '<span class="gi-badge">API</span>' : ''}
+    `;
+
+    if (!isStern) item.onclick = () => selectGame(key);
+    sb.appendChild(item);
+  }
+}
+
+// ── Game Selector (mobile) ────────────────────────────────────────────────
+
+function renderGameSelector() {
+  const dropdown = document.getElementById('gameDropdown');
+  const selector = document.getElementById('gameSelector');
+
+  const entries = Object.entries(allGames).sort((a, b) => {
+    const aS = a[1].source === 'stern' ? 1 : 0;
+    const bS = b[1].source === 'stern' ? 1 : 0;
+    if (aS !== bS) return aS - bS;
+    return (a[1].display_name || '').localeCompare(b[1].display_name || '');
+  });
+
+  let html = '<option value="">— Choose a game —</option>';
+  let lastSection = '';
+  for (const [key, game] of entries) {
+    const isStern = game.source === 'stern';
+    const section = isStern ? 'stern' : 'editable';
+    if (section !== lastSection) {
+      if (lastSection) html += '</optgroup>';
+      html += `<optgroup label="${isStern ? 'Stern API (Read-Only)' : 'Editable Games'}">`;
+      lastSection = section;
+    }
+    const sub = [game.manufacturer || '', game.edition || ''].filter(Boolean).join(' · ');
+    const label = game.display_name + (sub ? ` — ${sub}` : '') + (isStern ? ' 🔒' : '');
+    html += `<option value="${key}" ${isStern ? 'disabled' : ''}>${label}</option>`;
+  }
+  if (lastSection) html += '</optgroup>';
+
+  dropdown.innerHTML = html;
+  if (selectedGame) dropdown.value = selectedGame;
+}
+
+function onGameSelect(key) {
+  if (key) selectGame(key);
+}
+
+// ── Editor ────────────────────────────────────────────────────────────────
+
+function selectGame(key) {
+  selectedGame = key;
+  const game = allGames[key];
+  if (!game) return;
+
+  const panel = document.getElementById('editorPanel');
+  const sub = [game.manufacturer || '', game.edition || ''].filter(Boolean).join(' · ');
+
+  const banner = GAME_BANNERS[key] || game.primary_background || '';
+
+  panel.innerHTML = `
+    <div class="editor-header">
+      ${banner ? `<div class="eh-bg" style="background-image:url('${banner}')"></div>` : ''}
+      <div class="eh-overlay"></div>
+      <div class="eh-content">
+        ${logoHtml(key, game.display_name, 64, (GAME_LOGOS[key] || game.square_logo) ? 'eh-logo' : 'eh-fallback', game.square_logo)}
+        <div class="eh-text">
+          <h2>${game.display_name}</h2>
+          <p>${sub} — Top 10 Scores</p>
+        </div>
+      </div>
+    </div>
+    <table class="score-table">
+      <thead>
+        <tr><th style="width:50px">#</th><th>Name</th><th>Score</th><th style="width:50px"></th></tr>
+      </thead>
+      <tbody id="scoreBody"></tbody>
+    </table>
+    <div class="actions">
+      <button class="btn btn-secondary" onclick="addScore()">+ Add Score</button>
+      <button class="btn btn-primary" onclick="saveScores()">💾 Save Changes</button>
+    </div>
+  `;
+
+  renderScoreTable(game, key);
+  renderSidebar();
+  document.getElementById('gameDropdown').value = key;
+}
+
+function renderScoreTable(game, key) {
+  const body = document.getElementById('scoreBody');
+  if (!body) return;
+  body.innerHTML = '';
+  const theme = GAME_THEMES[key] || DEFAULT_THEME;
+  const scores = game.scores || [];
+
+  for (let i = 0; i < scores.length && i < 10; i++) {
+    const s = scores[i];
+    const color = theme.colors[i % theme.colors.length];
+    const tr = document.createElement('tr');
+    tr.className = 'score-row';
+    tr.innerHTML = `
+      <td><span class="rank" style="background:${color}">${i + 1}</span></td>
+      <td><input class="name-input" value="${s.username || ''}" data-idx="${i}" placeholder="NAME"></td>
+      <td><input class="score-input" value="${formatScore(s.score)}" data-idx="${i}" placeholder="0"></td>
+      <td><button class="delete-btn" onclick="deleteScore(${i})" title="Remove">✕</button></td>
+    `;
+    body.appendChild(tr);
+  }
+
+  body.querySelectorAll('.score-input').forEach(el => {
+    el.addEventListener('blur', () => {
+      el.value = formatScore(parseScoreInput(el.value));
+    });
+  });
+}
+
+function addScore() {
+  if (!selectedGame) return;
+  const game = allGames[selectedGame];
+  if (!game) return;
+  if (!game.scores) game.scores = [];
+
+  syncTableToData();
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal-box">
+      <h3>🎯 Add Score</h3>
+      <label>Player Name</label>
+      <input type="text" id="modalName" maxlength="20" placeholder="e.g. John Smith" autofocus>
+      <label>Score</label>
+      <input type="text" id="modalScore" class="score-field" placeholder="e.g. 1,250,000">
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn btn-primary" id="modalAdd">Add</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const nameInput = document.getElementById('modalName');
+  const scoreInput = document.getElementById('modalScore');
+  nameInput.focus();
+
+  function submit() {
+    const pName = nameInput.value.trim();
+    const pScore = parseScoreInput(scoreInput.value);
+    if (!pName) { nameInput.style.borderColor = '#f85149'; return; }
+    if (!pScore) { scoreInput.style.borderColor = '#f85149'; return; }
+    overlay.remove();
+
+    game.scores.push({
+      username: pName.toUpperCase(),
+      avatar_path: '', background_color_hex: '#888',
+      score: pScore, is_all_access: false,
+    });
+    game.scores.sort((a, b) => b.score - a.score);
+    const bumped = game.scores.length > 10 ? game.scores[10].username : null;
+    if (game.scores.length > 10) game.scores.length = 10;
+    renderScoreTable(game, selectedGame);
+    const msg = bumped
+      ? `Added ${pName.toUpperCase()} — ${formatScore(pScore)} (bumped ${bumped})`
+      : `Added ${pName.toUpperCase()} — ${formatScore(pScore)}`;
+    showToast(msg);
+  }
+
+  document.getElementById('modalAdd').onclick = submit;
+  document.getElementById('modalCancel').onclick = () => overlay.remove();
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  scoreInput.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') scoreInput.focus(); });
+}
+
+function deleteScore(idx) {
+  if (!selectedGame) return;
+  const game = allGames[selectedGame];
+  if (!game || !game.scores) return;
+  syncTableToData();
+  const removed = game.scores.splice(idx, 1);
+  renderScoreTable(game, selectedGame);
+  if (removed.length) showToast(`Removed ${removed[0].username}`);
+}
+
+function syncTableToData() {
+  if (!selectedGame) return;
+  const game = allGames[selectedGame];
+  if (!game || !game.scores) return;
+  document.querySelectorAll('.name-input').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    if (game.scores[idx]) game.scores[idx].username = el.value.trim().toUpperCase();
+  });
+  document.querySelectorAll('.score-input').forEach(el => {
+    const idx = parseInt(el.dataset.idx);
+    if (game.scores[idx]) game.scores[idx].score = parseScoreInput(el.value);
+  });
+  game.scores.sort((a, b) => b.score - a.score);
+}
+
+async function saveScores() {
+  if (!selectedGame) return;
+  const game = allGames[selectedGame];
+  if (!game) return;
+  syncTableToData();
+
+  const payload = {
+    machine_id: selectedGame,
+    game: game.display_name,
+    manufacturer: game.manufacturer || '',
+    edition: game.edition || '',
+    games_played: game.games_played || 0,
+    high_scores: game.scores.map(s => ({ initials: s.username, score: s.score })),
+  };
+
+  try {
+    const resp = await fetch('/api/scores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+      body: JSON.stringify(payload),
+    });
+    if (resp.ok) {
+      showToast('Scores saved! ✓');
+      await loadGames();
+      if (selectedGame) selectGame(selectedGame);
+    } else {
+      const err = await resp.json().catch(() => ({}));
+      showToast(err.error || `Save failed (${resp.status})`, true);
+    }
+  } catch { showToast('Network error', true); }
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = 'toast', 2500);
+}
+</script>
+</body>
+</html>

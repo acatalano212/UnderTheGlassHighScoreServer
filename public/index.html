@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Under the Glass – Leaderboard</title>
+<link rel="icon" type="image/png" sizes="32x32" href="static/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="static/favicon-192.png">
+<link rel="apple-touch-icon" href="static/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ------------------------------------------------------------------ reset */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{
+  font-family:'Oswald','Impact','Arial Narrow',sans-serif;
+  background:#0d1117;
+  background-image:radial-gradient(ellipse at 50% 0%,rgba(40,50,70,.35) 0%,transparent 70%);
+  color:#ccc;
+  min-height:100vh;
+}
+
+/* ------------------------------------------------------------- top banner */
+.banner{
+  width:100%;
+  background:linear-gradient(180deg,#161b22 0%,#0d1117 100%);
+  border-bottom:2px solid rgba(255,255,255,.06);
+  padding:1rem 2rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:.5rem;
+}
+.banner-brand{
+  display:flex;align-items:center;gap:.6rem;
+}
+.banner-brand .brand-logo{height:50px;object-fit:contain}
+.banner-center{text-align:center;flex:1 1 auto}
+.banner-center .location{
+  font-size:.95rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#8b949e;
+}
+.banner-center .lb-title{
+  font-size:1.5rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#e6edf3;
+}
+.banner-right{
+  font-size:.85rem;color:#8b949e;letter-spacing:.08em;text-align:right;
+}
+
+/* ------------------------------------------------------------------ grid */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1.4rem;
+  padding:1.6rem 2rem 3rem;
+  max-width:2200px;
+  margin:0 auto;
+}
+@media(max-width:1400px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr;padding:1rem}
+  .banner{padding:1rem}
+}
+
+/* ----------------------------------------------------------- game cards */
+.game-card{
+  background:rgba(255,255,255,.03);
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.06);
+  display:flex;flex-direction:column;
+  height:390px;
+  cursor:pointer;
+  transition:border-color .2s, transform .15s;
+}
+.game-card:hover{
+  border-color:rgba(255,255,255,.18);
+  transform:scale(1.01);
+}
+.game-card .scores-list{
+  flex:1;overflow:hidden;
+}
+
+/* card header */
+.card-header{
+  position:relative;
+  height:110px;
+  display:flex;
+  align-items:center;
+  padding:0 1.5rem;
+  overflow:hidden;
+}
+.card-header .bg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+}
+.card-header .overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.45) 50%,rgba(0,0,0,.7) 100%);
+}
+.card-header .content{
+  position:relative;z-index:1;
+  display:flex;align-items:center;gap:1rem;width:100%;
+}
+.card-header .title-group{
+  display:flex;flex-direction:column;justify-content:center;
+}
+.card-header .game-logo{
+  width:72px;height:72px;border-radius:8px;object-fit:contain;
+  background:rgba(0,0,0,.4);flex-shrink:0;
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
+}
+.card-header .title-text{
+  font-size:1.8rem;font-weight:700;color:#fff;
+  text-transform:uppercase;letter-spacing:.1em;
+  text-shadow:0 2px 8px rgba(0,0,0,.7);
+}
+.card-header .subtitle-text{
+  font-size:.9rem;font-weight:400;color:rgba(255,255,255,.8);
+  letter-spacing:.05em;margin-top:4px;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+.card-header .mfg-logo{
+  position:absolute;top:50%;right:1.5rem;z-index:2;
+  height:72px;width:auto;opacity:.7;
+  transform:translateY(-50%);
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
+}
+
+/* ---------------------------------------------------------- score rows */
+.score-row{
+  display:flex;align-items:center;gap:.7rem;
+  padding:.55rem 1rem;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  transition:background .15s;
+}
+.score-row:last-child{border-bottom:none}
+.score-row:hover{background:rgba(255,255,255,.05)}
+.score-row.all-access{
+  outline:1px solid rgba(255,215,0,.45);
+  outline-offset:-1px;
+  border-radius:6px;
+}
+
+.rank-num{
+  width:28px;text-align:center;
+  font-size:1rem;font-weight:600;color:#888;flex-shrink:0;
+}
+
+.avatar{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0;
+  text-transform:uppercase;letter-spacing:.02em;
+  overflow:hidden;
+}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+.username{
+  flex:1 1 auto;
+  font-size:.95rem;font-weight:600;letter-spacing:.04em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+.score-val{
+  font-family:'Roboto Mono','Courier New',monospace;
+  font-size:.95rem;font-weight:600;color:#fff;
+  white-space:nowrap;
+}
+
+/* ------------------------------------------------------------ footer */
+.page-footer{
+  text-align:center;padding:1rem;
+  font-size:.7rem;color:#484f58;letter-spacing:.06em;
+}
+
+/* loading state */
+.loading{
+  text-align:center;padding:4rem;
+  font-size:1.2rem;color:#8b949e;
+  grid-column:1/-1;
+}
+
+/* --------------------------------------------------------- carousel */
+.carousel-page{
+  display:none;
+  grid-template-columns:repeat(2,1fr);
+  gap:1.4rem;
+}
+.carousel-page.active{
+  display:grid;
+}
+.carousel-container{
+  position:relative;
+  padding:1.6rem 2rem 3rem;
+  max-width:2200px;
+  margin:0 auto;
+  opacity:1;
+  transition:opacity .4s ease-in-out;
+}
+.carousel-container.fading{
+  opacity:0;
+}
+@media(max-width:1400px){
+  .carousel-page{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:900px){
+  .carousel-page{grid-template-columns:1fr;display:grid !important}
+  .carousel-container{padding:1rem}
+  .carousel-dots{display:none}
+  .carousel-container.fading{opacity:1}
+  .banner{padding:1rem}
+  .card-header .mfg-logo{display:none}
+}
+
+/* carousel dots */
+.carousel-dots{
+  display:flex;justify-content:center;gap:.5rem;
+  padding:.5rem 0 1rem;
+}
+.carousel-dot{
+  width:10px;height:10px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  transition:background .3s;
+}
+.carousel-dot.active{background:#e6edf3}
+@media(max-width:900px){
+  .carousel-dots{display:none !important}
+}
+
+/* --------------------------------------------------------- detail view */
+.detail-view{
+  max-width:800px;
+  margin:0 auto;
+  padding:1.6rem 2rem 3rem;
+}
+.detail-back{
+  display:inline-flex;align-items:center;gap:.4rem;
+  color:#8b949e;font-size:.95rem;font-weight:600;
+  letter-spacing:.06em;cursor:pointer;
+  margin-bottom:1.2rem;
+  transition:color .2s;
+}
+.detail-back:hover{color:#e6edf3}
+.detail-card{
+  background:rgba(255,255,255,.03);
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.06);
+}
+.detail-header{
+  position:relative;
+  height:140px;
+  display:flex;
+  align-items:center;
+  padding:0 1.5rem;
+  overflow:hidden;
+}
+.detail-header .bg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+}
+.detail-header .overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.45) 50%,rgba(0,0,0,.7) 100%);
+}
+.detail-header .content{
+  position:relative;z-index:1;
+  display:flex;align-items:center;gap:1rem;width:100%;
+}
+.detail-header .title-group{
+  display:flex;flex-direction:column;justify-content:center;
+}
+.detail-header .game-logo{
+  width:72px;height:72px;border-radius:8px;object-fit:contain;
+  background:rgba(0,0,0,.4);flex-shrink:0;
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
+}
+.detail-header .title-text{
+  font-size:1.8rem;font-weight:700;color:#fff;
+  text-transform:uppercase;letter-spacing:.1em;
+  text-shadow:0 2px 8px rgba(0,0,0,.7);
+}
+.detail-header .subtitle-text{
+  font-size:.9rem;font-weight:400;color:rgba(255,255,255,.8);
+  letter-spacing:.05em;margin-top:4px;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+.detail-header .mfg-logo{
+  position:absolute;top:50%;right:1.5rem;z-index:2;
+  height:72px;width:auto;opacity:.7;
+  transform:translateY(-50%);
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
+}
+.detail-scores .score-row{
+  padding:.7rem 1.5rem;
+  font-size:1.05rem;
+}
+.detail-scores .rank-num{
+  width:32px;font-size:1.1rem;
+}
+.detail-scores .avatar{
+  width:38px;height:38px;font-size:.9rem;
+}
+.detail-scores .score-val{
+  font-size:1.05rem;
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ BANNER -->
+<div class="banner">
+  <div class="banner-brand">
+    <img src="static/utg-logo.png" alt="Under the Glass" class="brand-logo">
+  </div>
+  <div class="banner-center">
+    <div class="location">UNDER THE GLASS</div>
+    <div class="lb-title" id="lb-title">Loading...</div>
+  </div>
+  <div class="banner-right" id="date-range"></div>
+</div>
+
+<!-- ============================================================= GRID -->
+<div class="carousel-container" id="carousel-container">
+  <div class="loading">Loading leaderboard data…</div>
+</div>
+<div class="carousel-dots" id="carousel-dots"></div>
+
+<!-- Detail view (hidden by default) -->
+<div class="detail-view" id="detail-view" style="display:none"></div>
+
+<div class="page-footer" id="footer"></div>
+<div style="text-align:center;padding-bottom:1rem">
+  <a href="/admin" class="admin-cog" title="Admin">⚙</a>
+</div>
+<style>
+.admin-cog{font-size:1rem;color:rgba(255,255,255,.06);text-decoration:none;transition:color .2s}
+.admin-cog:hover{color:rgba(255,255,255,.4)}
+</style>
+
+<script>
+// JJP game config — artwork and logos for known JJP titles
+const JJP_ASSETS = {
+  'jjp-hp-we': {
+    primary_background: 'static/hp-banner.jpg',
+    square_logo: 'static/hp-logo.png',
+  },
+  'jjp-hp-ce': {
+    primary_background: 'static/hpce-banner.jpg',
+    square_logo: 'static/hp-logo.png',
+  },
+  'jjp-avatar': {
+    primary_background: 'static/avatar-banner.webp',
+    square_logo: 'static/avatar-logo.png',
+  },
+  'jjp-godfather': {
+    primary_background: 'static/godfather-banner.jpg',
+    square_logo: 'static/godfather-logo.png',
+  },
+  'jjp-toystory4': {
+    primary_background: 'static/toystory-banner.jpg',
+    square_logo: 'static/toystory-logo.webp',
+  },
+  'jjp-eltonjohn': {
+    primary_background: 'static/eltonjohn-banner.jpg',
+    square_logo: 'static/eltonjohn-logo.webp',
+  },
+  'jjp-potc': {
+    primary_background: 'static/potc-banner.jpg',
+    square_logo: 'static/potc-logo.webp',
+  },
+  "jjp-gnr": {
+    primary_background: 'static/gnr-banner.jpg',
+    square_logo: 'static/gnr-logo.webp',
+  },
+  "bof-wmh": {
+    primary_background: 'static/wmh-banner.avif',
+    square_logo: 'static/wmh-logo.png',
+  },
+  "spooky-bj": {
+    primary_background: 'static/beetlejuice-banner.jpg',
+    square_logo: 'static/beetlejuice-logo.png',
+  },
+  "stern-dnd": {
+    primary_background: 'static/dnd-banner.webp',
+    square_logo: 'static/dnd-logo.webp',
+  },
+  "stern-pokemon": {
+    primary_background: 'static/pokemon-banner.webp',
+    square_logo: 'static/pokemon-logo.webp',
+  },
+  "cgc-mm": {
+    primary_background: 'static/medievalmadness-banner.jpg',
+    square_logo: 'static/medievalmadness-logo.png',
+  },
+  "bof-dune": {
+    primary_background: 'static/dune-banner.png',
+    square_logo: 'static/dune-logo.webp',
+  },
+  "stern-metallica": {
+    primary_background: 'static/metallica-banner.webp',
+    square_logo: 'static/metallica-logo.webp',
+  },
+  "stern-godzilla": {
+    primary_background: 'static/godzilla-banner.webp',
+    square_logo: 'static/godzilla-logo.webp',
+  },
+  "stern-jaws": {
+    primary_background: 'static/jaws-banner.webp',
+    square_logo: 'static/jaws-logo.webp',
+  },
+};
+
+// Manufacturer logo mapping
+const MFG_LOGOS = {
+  'Jersey Jack Pinball': 'static/jjp-mfg-logo.webp',
+  'Stern Pinball': 'static/stern-mfg-logo.webp',
+  'Spooky Pinball': 'static/spooky-mfg-logo.png',
+  'Chicago Gaming': 'static/cgc-mfg-logo.png',
+  'Barrels of Fun': 'static/bof-mfg-logo.png',
+};
+
+// Per-game color palettes for score rows
+const GAME_THEMES = {
+  'jjp-hp-we':       { colors: ['#740001','#ae0001','#eeba30','#1a472a','#2a623d','#222f5b','#5d5d5d'] },
+  'jjp-hp-ce':       { colors: ['#740001','#ae0001','#eeba30','#1a472a','#2a623d','#222f5b','#5d5d5d'] },
+  'jjp-avatar':      { colors: ['#0077b6','#00b4d8','#2d6a4f','#40916c','#52b788','#90e0ef','#74c69d'] },
+  'jjp-eltonjohn':   { colors: ['#ff006e','#8338ec','#fb5607','#ffbe0b','#ff69b4','#c77dff','#e0aaff'] },
+  'jjp-gnr':         { colors: ['#d00000','#e85d04','#faa307','#6a040f','#9d0208','#dc2f02','#370617'] },
+  'jjp-potc':        { colors: ['#b08968','#7f5539','#ddb892','#264653','#e9c46a','#e76f51','#f4a261'] },
+  'jjp-godfather':   { colors: ['#590d22','#800f2f','#a4133c','#c9184a','#ff4d6d','#6c757d','#343a40'] },
+  'jjp-toystory4':   { colors: ['#1d3557','#457b9d','#e63946','#2a9d8f','#e9c46a','#f4a261','#264653'] },
+  'stern-dnd':       { colors: ['#7b2cbf','#5a189a','#c77dff','#9d4edd','#e0aaff','#3c096c','#240046'] },
+  'stern-pokemon':   { colors: ['#ffbe0b','#fb5607','#ff006e','#3a86ff','#8338ec','#06d6a0','#ef476f'] },
+  'stern-metallica': { colors: ['#495057','#adb5bd','#212529','#6c757d','#343a40','#868e96','#ced4da'] },
+  'stern-godzilla':  { colors: ['#2d6a4f','#40916c','#95d5b2','#1b4332','#52b788','#74c69d','#b7e4c7'] },
+  'stern-jaws':      { colors: ['#023e8a','#0077b6','#0096c7','#00b4d8','#48cae4','#ade8f4','#90e0ef'] },
+  'bof-wmh':         { colors: ['#6c567b','#c06c84','#f67280','#f8b500','#355c7d','#725a7a','#544179'] },
+  'spooky-bj':       { colors: ['#ff69b4','#9b5de5','#00f5d4','#f15bb5','#fee440','#00bbf9','#7209b7'] },
+  'cgc-mm':          { colors: ['#1d3557','#e63946','#a8dadc','#457b9d','#e9c46a','#264653','#f1faee'] },
+  'bof-dune':        { colors: ['#e09f3e','#9e2a2b','#335c67','#540b0e','#fff3b0','#cb997e','#6b705c'] },
+};
+const DEFAULT_THEME = { colors: ['#888','#aaa','#666','#999','#777','#bbb','#555'] };
+function getTheme(gameKey) { return GAME_THEMES[gameKey] || DEFAULT_THEME; }
+
+function getInitials(username) {
+  if (!username) return '??';
+  const parts = username.trim().split(/[\s._-]+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return username.slice(0, 2).toUpperCase();
+}
+
+function formatScore(n) {
+  return n.toLocaleString('en-US');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function buildSubtitle(game) {
+  const parts = [];
+  if (game.manufacturer) parts.push(game.manufacturer);
+  if (game.edition) parts.push(game.edition);
+  return parts.join(' · ');
+}
+
+function renderCard(name, game) {
+  const isJjp = game.source === 'jjp';
+  const gameKey = game.machine_id || game.title_code || name;
+  const assets = isJjp ? (JJP_ASSETS[gameKey] || {}) : game;
+  const bg = assets.primary_background || game.primary_background || '';
+  const logo = assets.square_logo || game.square_logo || '';
+  const displayName = game.display_name || name;
+  const subtitle = buildSubtitle(game);
+
+  let html = `<div class="game-card" data-game="${escapeHtml(name)}">`;
+
+  // Header
+  html += '<div class="card-header">';
+  html += `<div class="bg" style="background-image:url('${bg}')"></div>`;
+  html += '<div class="overlay"></div>';
+  const mfgLogo = MFG_LOGOS[game.manufacturer] || '';
+  if (mfgLogo) {
+    html += `<img class="mfg-logo" src="${mfgLogo}" alt="">`;
+  }
+  html += '<div class="content">';
+  if (logo) {
+    html += `<img class="game-logo" src="${logo}" alt="${escapeHtml(displayName)} logo">`;
+  }
+  html += '<div class="title-group">';
+  html += `<div class="title-text">${escapeHtml(displayName)}</div>`;
+  if (subtitle) html += `<div class="subtitle-text">${escapeHtml(subtitle)}</div>`;
+  html += '</div></div></div>';
+
+  // Scores
+  html += '<div class="scores-list">';
+  const scores = (game.scores || []).slice(0, 5);
+  const theme = getTheme(name);
+  scores.forEach((s, i) => {
+    const allAccess = s.is_all_access ? ' all-access' : '';
+    const color = isJjp ? theme.colors[i % theme.colors.length] : (s.background_color_hex || '#888');
+    const avatarContent = s.avatar_path
+      ? `<img src="${s.avatar_path}" alt="${escapeHtml(s.username)}">`
+      : getInitials(s.username);
+
+    html += `<div class="score-row${allAccess}">`;
+    html += `<span class="rank-num">${i + 1}</span>`;
+    html += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
+    html += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
+    html += `<span class="score-val">${formatScore(s.score)}</span>`;
+    html += '</div>';
+  });
+
+  html += '</div></div>';
+  return html;
+}
+
+let carouselTimer = null;
+let currentPage = 0;
+let totalPages = 0;
+let allGamesData = {}; // store for detail view
+
+function chunkArray(arr, size) {
+  const chunks = [];
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
+  return chunks;
+}
+
+function showPage(pageIndex) {
+  const container = document.getElementById('carousel-container');
+  const pages = document.querySelectorAll('.carousel-page');
+  const dots = document.querySelectorAll('.carousel-dot');
+
+  // Fade out
+  container.classList.add('fading');
+  setTimeout(() => {
+    // Swap pages while hidden
+    pages.forEach((p, i) => p.classList.toggle('active', i === pageIndex));
+    dots.forEach((d, i) => d.classList.toggle('active', i === pageIndex));
+    currentPage = pageIndex;
+    // Fade back in
+    container.classList.remove('fading');
+  }, 400);
+}
+
+function startCarousel() {
+  if (carouselTimer) clearInterval(carouselTimer);
+  if (totalPages <= 1) return;
+  carouselTimer = setInterval(() => {
+    const next = (currentPage + 1) % totalPages;
+    showPage(next);
+  }, 5000);
+}
+
+function showDetail(gameName) {
+  // Pause carousel
+  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+
+  // Find the game data by key
+  const entry = Object.entries(allGamesData).find(([k]) => k === gameName);
+  if (!entry) return;
+  const [name, game] = entry;
+  const isJjp = game.source === 'jjp';
+  const gameKey = game.machine_id || game.title_code || name;
+  const assets = isJjp ? (JJP_ASSETS[gameKey] || {}) : game;
+  const bg = assets.primary_background || game.primary_background || '';
+  const logo = assets.square_logo || game.square_logo || '';
+  const displayName = game.display_name || name;
+  const subtitle = buildSubtitle(game);
+
+  let html = '<div class="detail-back" onclick="hideDetail()">← Back to Leaderboard</div>';
+  html += '<div class="detail-card">';
+
+  // Header
+  html += '<div class="detail-header">';
+  html += `<div class="bg" style="background-image:url('${bg}')"></div>`;
+  html += '<div class="overlay"></div>';
+  html += '<div class="content">';
+  if (logo) {
+    html += `<img class="game-logo" src="${logo}" alt="${escapeHtml(displayName)} logo">`;
+  }
+  html += '<div class="title-group">';
+  html += `<div class="title-text">${escapeHtml(displayName)}</div>`;
+  if (subtitle) html += `<div class="subtitle-text">${escapeHtml(subtitle)}</div>`;
+  html += '</div>';
+  const detailMfgLogo = MFG_LOGOS[game.manufacturer] || '';
+  if (detailMfgLogo) {
+    html += `<img class="mfg-logo" src="${detailMfgLogo}" alt="">`;
+  }
+  html += '</div></div>';
+
+  // Top 10 scores
+  html += '<div class="detail-scores">';
+  const scores = (game.scores || []).slice(0, 10);
+  const theme = getTheme(name);
+  scores.forEach((s, i) => {
+    const allAccess = s.is_all_access ? ' all-access' : '';
+    const color = isJjp ? theme.colors[i % theme.colors.length] : (s.background_color_hex || '#888');
+    const avatarContent = s.avatar_path
+      ? `<img src="${s.avatar_path}" alt="${escapeHtml(s.username)}">`
+      : getInitials(s.username);
+
+    html += `<div class="score-row${allAccess}">`;
+    html += `<span class="rank-num">${i + 1}</span>`;
+    html += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
+    html += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
+    html += `<span class="score-val">${formatScore(s.score)}</span>`;
+    html += '</div>';
+  });
+  html += '</div></div>';
+
+  // Hide carousel, show detail
+  document.getElementById('carousel-container').style.display = 'none';
+  document.getElementById('carousel-dots').style.display = 'none';
+  const detailView = document.getElementById('detail-view');
+  detailView.innerHTML = html;
+  detailView.style.display = 'block';
+}
+
+function hideDetail() {
+  document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('carousel-container').style.display = '';
+  document.getElementById('carousel-dots').style.display = '';
+  startCarousel();
+}
+
+async function loadDashboard() {
+  try {
+    const resp = await fetch('/api/scores');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+
+    // Update banner
+    document.getElementById('lb-title').textContent = data.leaderboard?.title || 'Leaderboard';
+    document.getElementById('date-range').textContent = data.leaderboard?.date_range || '';
+
+    // Collect all game cards — alphabetical order
+    const games = data.games || {};
+    allGamesData = games;
+    const sorted = Object.entries(games).sort(([kA, a], [kB, b]) => {
+      return (a.display_name || kA).localeCompare(b.display_name || kB);
+    });
+
+    // Build card HTML for each game
+    const cards = sorted.map(([name, game]) => renderCard(name, game));
+
+    // Chunk into pages of 4
+    const pages = chunkArray(cards, 4);
+    totalPages = pages.length;
+
+    // Build carousel HTML
+    const container = document.getElementById('carousel-container');
+    let html = '';
+    pages.forEach((page, i) => {
+      html += `<div class="carousel-page${i === 0 ? ' active' : ''}">`;
+      html += page.join('');
+      html += '</div>';
+    });
+    container.innerHTML = html || '<div class="loading">No games found</div>';
+
+    // Build dots (desktop only)
+    const dotsContainer = document.getElementById('carousel-dots');
+    if (window.innerWidth > 900) {
+      let dotsHtml = '';
+      for (let i = 0; i < totalPages; i++) {
+        dotsHtml += `<div class="carousel-dot${i === 0 ? ' active' : ''}" onclick="showPage(${i}); startCarousel();"></div>`;
+      }
+      dotsContainer.innerHTML = dotsHtml;
+    } else {
+      dotsContainer.innerHTML = '';
+      dotsContainer.style.display = 'none';
+    }
+
+    // Start carousel (desktop only)
+    currentPage = 0;
+    if (window.innerWidth > 900) {
+      startCarousel();
+    }
+
+    // Update footer
+    const now = new Date();
+    document.getElementById('footer').textContent =
+      `Auto-refreshes every 60 s · Last updated ${now.toLocaleString()}`;
+
+  } catch (err) {
+    console.error('Failed to load dashboard:', err);
+    document.getElementById('carousel-container').innerHTML =
+      `<div class="loading">Error loading data: ${err.message}. Retrying…</div>`;
+  }
+}
+
+// Click delegation for game cards (handles special chars in names)
+document.addEventListener('click', (e) => {
+  const card = e.target.closest('.game-card');
+  if (card && card.dataset.game) showDetail(card.dataset.game);
+});
+
+// Initial load + auto-refresh
+loadDashboard();
+setInterval(loadDashboard, 60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "under-the-glass-server",
+  "version": "1.0.0",
+  "description": "Under the Glass — Self-hosted pinball high score kiosk server for Raspberry Pi",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "author": "Anthony Catalano",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  }
+}
