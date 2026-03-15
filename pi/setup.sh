@@ -49,7 +49,7 @@ echo "    Node $(node -v), npm $(npm -v)"
 # ---------------------------------------------------------------------------
 echo ">>> Installing kiosk dependencies..."
 sudo apt-get install -y -qq \
-  chromium-browser \
+  chromium \
   xserver-xorg \
   x11-xserver-utils \
   xinit \

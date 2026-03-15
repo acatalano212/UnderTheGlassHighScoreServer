@@ -31,7 +31,7 @@ xset -dpms
 xset s noblank
 
 # Launch Chromium in kiosk mode
-exec chromium-browser \
+exec chromium \
   --noerrdialogs \
   --disable-infobars \
   --disable-session-crashed-bubble \
