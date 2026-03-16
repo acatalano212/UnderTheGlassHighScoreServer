@@ -258,19 +258,21 @@ body{
   display:grid;
   grid-template-columns:30% 1fr 25%;
   gap:1.5rem;
-  align-items:center;
+  align-items:start;
   min-height:calc(100vh - 140px);
   overflow:hidden;
 }
 .detail-machine{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:center;
   padding:1rem 0;
+  overflow:hidden;
+  max-height:calc(100vh - 140px);
 }
 .detail-machine img{
   max-width:100%;
-  max-height:680px;
+  max-height:calc(100vh - 160px);
   height:auto;
   display:block;
   object-fit:contain;
@@ -285,10 +287,10 @@ body{
 }
 .detail-header{
   position:relative;
-  height:180px;
+  height:260px;
   display:flex;
   align-items:center;
-  padding:0 1.5rem;
+  padding:0 2rem;
   overflow:hidden;
   border-radius:10px 10px 0 0;
   border:1px solid rgba(255,255,255,.06);
@@ -304,29 +306,29 @@ body{
 }
 .detail-header .content{
   position:relative;z-index:1;
-  display:flex;align-items:center;gap:1rem;width:100%;
+  display:flex;align-items:center;gap:1.5rem;width:100%;
 }
 .detail-header .title-group{
   display:flex;flex-direction:column;justify-content:center;
 }
 .detail-header .game-logo{
-  width:72px;height:72px;border-radius:8px;object-fit:contain;
+  width:110px;height:110px;border-radius:10px;object-fit:contain;
   background:rgba(0,0,0,.4);flex-shrink:0;
   filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
 }
 .detail-header .title-text{
-  font-size:1.8rem;font-weight:700;color:#fff;
+  font-size:2.6rem;font-weight:700;color:#fff;
   text-transform:uppercase;letter-spacing:.1em;
   text-shadow:0 2px 8px rgba(0,0,0,.7);
 }
 .detail-header .subtitle-text{
-  font-size:.9rem;font-weight:400;color:rgba(255,255,255,.8);
-  letter-spacing:.05em;margin-top:4px;
+  font-size:1.15rem;font-weight:400;color:rgba(255,255,255,.8);
+  letter-spacing:.05em;margin-top:6px;
   text-shadow:0 1px 4px rgba(0,0,0,.7);
 }
 .detail-header .mfg-logo{
-  position:absolute;top:50%;right:1.5rem;z-index:2;
-  height:72px;width:auto;opacity:.7;
+  position:absolute;top:50%;right:2rem;z-index:2;
+  height:100px;width:auto;opacity:.7;
   transform:translateY(-50%);
   filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
 }
@@ -481,12 +483,10 @@ body{
 <!-- Detail view (hidden by default) -->
 <div class="detail-view" id="detail-view" style="display:none"></div>
 
-<div class="page-footer" id="footer"></div>
-<div style="text-align:center;padding-bottom:1rem">
-  <a href="/admin.html" class="admin-cog" title="Admin">⚙</a>
-</div>
+<a href="/admin.html" class="admin-cog" title="Admin">⚙</a>
 <style>
-.admin-cog{font-size:1rem;color:rgba(255,255,255,.06);text-decoration:none;transition:color .2s}
+.admin-cog{font-size:1rem;color:rgba(255,255,255,.06);text-decoration:none;transition:color .2s;
+  position:fixed;bottom:1rem;right:1rem;z-index:100}
 .admin-cog:hover{color:rgba(255,255,255,.4)}
 </style>
 
@@ -1467,11 +1467,6 @@ async function loadDashboard() {
         startCarousel();
       }
     }
-
-    // Update footer
-    const now = new Date();
-    document.getElementById('footer').textContent =
-      `Auto-refreshes every 60 s · Last updated ${now.toLocaleString()}`;
 
   } catch (err) {
     console.error('Failed to load dashboard:', err);
