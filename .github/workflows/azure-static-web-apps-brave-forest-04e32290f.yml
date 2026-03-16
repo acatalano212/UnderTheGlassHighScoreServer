@@ -19,6 +19,8 @@ jobs:
         with:
           submodules: true
           lfs: false
+      - name: Build public site
+        run: node build-azure.cjs
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
