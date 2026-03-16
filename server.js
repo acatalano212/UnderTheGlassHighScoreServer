@@ -40,6 +40,17 @@ const STERN_LEADERBOARD_URL = "https://api.prd.sternpinball.io/api/v1/portal/lea
 const STERN_GAME_TITLES_URL = "https://cms.prd.sternpinball.io/api/v1/portal/game_titles/";
 const CACHE_TTL = 300_000; // 5 minutes
 
+// ---------------------------------------------------------------------------
+// Activity Log (in-memory ring buffer)
+// ---------------------------------------------------------------------------
+const ACTIVITY_LOG_MAX = 200;
+const activityLog = [];
+
+function logActivity(type, detail) {
+  activityLog.unshift({ ts: new Date().toISOString(), type, ...detail });
+  if (activityLog.length > ACTIVITY_LOG_MAX) activityLog.length = ACTIVITY_LOG_MAX;
+}
+
 const DATA_DIR = join(__dirname, "data");
 const SCORES_FILE = join(DATA_DIR, "scores.json");
 
@@ -306,9 +317,16 @@ async function cachedGet(url, key) {
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     sternCache[key] = { ts: now, data };
+    if (key === "stern_lb") {
+      const gameCount = data?.leaderboard?.titles?.length || 0;
+      logActivity("stern_fetch", { gameCount, status: "ok" });
+    }
     return data;
   } catch (e) {
     console.warn(`Failed to fetch ${url}:`, e.message);
+    if (key === "stern_lb") {
+      logActivity("stern_fetch", { status: "error", error: e.message });
+    }
     return sternCache[key]?.data ?? null;
   }
 }
@@ -478,6 +496,13 @@ app.post("/api/scores", (req, res) => {
   });
 
   saveScores(jjpScores);
+  logActivity("xiao_score", {
+    game: body.game || "Unknown",
+    machineId,
+    ip: req.ip,
+    scoreCount: scores.length,
+    topScore: scores[0]?.score || 0,
+  });
   console.log(`Updated scores for ${machineId}: ${scores.length} entries`);
 
   res.json({ status: "ok", machine_id: machineId, scores_count: scores.length });
@@ -502,6 +527,11 @@ app.put("/api/scores/:machineId", (req, res) => {
 
   jjpScores.set(machineId, existing);
   saveScores(jjpScores);
+  logActivity("admin_edit", {
+    game: existing.game || machineId,
+    machineId,
+    ip: req.ip,
+  });
 
   res.json({ status: "ok", machine_id: machineId });
 });
@@ -526,7 +556,18 @@ app.put("/api/config", (req, res) => {
     delete sternCache["stern_lb"];
   }
   saveConfig(runtimeConfig);
+  logActivity("config_change", { ip: req.ip, changes: Object.keys(req.body) });
   res.json({ status: "ok", config: runtimeConfig });
+});
+
+// ---------------------------------------------------------------------------
+// Activity Log API
+// ---------------------------------------------------------------------------
+
+// GET /api/activity — recent activity log
+app.get("/api/activity", (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit) || 50, ACTIVITY_LOG_MAX);
+  res.json(activityLog.slice(0, limit));
 });
 
 // ---------------------------------------------------------------------------
@@ -649,6 +690,7 @@ app.get("/api/system", async (req, res) => {
 // Start server
 // ---------------------------------------------------------------------------
 const server = await app.listen(PORT, "0.0.0.0");
+logActivity("server_start", { port: PORT });
 console.log(`🎯 Under the Glass server running on http://0.0.0.0:${PORT}`);
 console.log(`   Dashboard: http://localhost:${PORT}/`);
 console.log(`   Admin:     http://localhost:${PORT}/admin.html`);

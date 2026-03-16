@@ -270,6 +270,22 @@ body{
   cursor:pointer;padding:.4rem .8rem;display:flex;align-items:center;gap:.4rem;
 }
 .settings-btn:hover{color:#e6edf3;border-color:#58a6ff}
+.header-actions{display:flex;gap:.5rem;align-items:center}
+
+/* activity log */
+.activity-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.activity-table th{text-align:left;color:#484f58;font-size:.65rem;letter-spacing:.1em;
+  text-transform:uppercase;padding:.4rem .6rem;border-bottom:1px solid #21262d}
+.activity-table td{padding:.5rem .6rem;border-bottom:1px solid #161b22;color:#c9d1d9}
+.activity-table tr:hover td{background:#161b22}
+.activity-type{display:inline-block;padding:.15rem .5rem;border-radius:10px;
+  font-size:.65rem;font-weight:600;letter-spacing:.05em}
+.type-xiao{background:#0d4429;color:#3fb950}
+.type-stern{background:#0c2d6b;color:#58a6ff}
+.type-admin{background:#4a2600;color:#d29922}
+.type-config{background:#3d1f52;color:#bc8cff}
+.type-server{background:#21262d;color:#8b949e}
+.activity-empty{text-align:center;color:#484f58;padding:2rem;font-style:italic}
 
 /* wifi status */
 .wifi-status{
@@ -383,7 +399,10 @@ body{
     <h1>Score Editor</h1>
   </div>
   <a href="/">← Back to Dashboard</a>
-  <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+  <div class="header-actions">
+    <button class="settings-btn" onclick="openActivityLog()">📋 Activity</button>
+    <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+  </div>
 </div>
 
 <!-- Split Layout -->
@@ -807,6 +826,95 @@ function signalBars(pct) {
     const active = pct >= thresh ? 'active' : '';
     return `<span class="${active}" style="height:${h}px"></span>`;
   }).join('');
+}
+
+// ─── Activity Log ─────────────────────────────────────────────────────────
+
+function activityTypeLabel(type) {
+  const map = {
+    xiao_score: ['XIAO', 'type-xiao'],
+    stern_fetch: ['STERN', 'type-stern'],
+    admin_edit: ['ADMIN', 'type-admin'],
+    config_change: ['CONFIG', 'type-config'],
+    server_start: ['SERVER', 'type-server'],
+  };
+  const [label, cls] = map[type] || [type.toUpperCase(), 'type-server'];
+  return `<span class="activity-type ${cls}">${label}</span>`;
+}
+
+function activityDetail(entry) {
+  switch (entry.type) {
+    case 'xiao_score':
+      return `<strong>${entry.game}</strong> — ${entry.scoreCount} scores (top: ${(entry.topScore||0).toLocaleString()}) from ${entry.ip}`;
+    case 'stern_fetch':
+      return entry.status === 'ok'
+        ? `Refreshed ${entry.gameCount} game(s) from Stern API`
+        : `<span style="color:#f85149">Error: ${entry.error}</span>`;
+    case 'admin_edit':
+      return `<strong>${entry.game}</strong> scores edited from ${entry.ip}`;
+    case 'config_change':
+      return `Settings updated (${(entry.changes||[]).join(', ')}) from ${entry.ip}`;
+    case 'server_start':
+      return `Server started on port ${entry.port}`;
+    default:
+      return JSON.stringify(entry);
+  }
+}
+
+function formatLogTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit', second:'2-digit', hour12:true });
+}
+
+async function openActivityLog() {
+  const overlay = document.createElement('div');
+  overlay.className = 'settings-overlay';
+  overlay.innerHTML = `
+    <div class="settings-panel" style="width:680px">
+      <h2>📋 Activity Log
+        <button class="settings-close" onclick="this.closest('.settings-overlay').remove()">✕</button>
+      </h2>
+      <p style="color:#8b949e;font-size:.8rem;margin:0 0 1rem">Score updates, API calls, and system events. Auto-refreshes every 10s.</p>
+      <div id="activity-content"><p class="activity-empty">Loading...</p></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  async function refreshLog() {
+    try {
+      const resp = await fetch('/api/activity?limit=100');
+      const entries = await resp.json();
+      const el = document.getElementById('activity-content');
+      if (!el) return;
+      if (entries.length === 0) {
+        el.innerHTML = '<p class="activity-empty">No activity yet. Score updates from XIAO devices and Stern API will appear here.</p>';
+        return;
+      }
+      el.innerHTML = `<table class="activity-table">
+        <thead><tr><th>Time</th><th>Source</th><th>Details</th></tr></thead>
+        <tbody>${entries.map(e => `<tr>
+          <td style="white-space:nowrap">${formatLogTime(e.ts)}</td>
+          <td>${activityTypeLabel(e.type)}</td>
+          <td>${activityDetail(e)}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    } catch (err) {
+      const el = document.getElementById('activity-content');
+      if (el) el.innerHTML = `<p class="activity-empty" style="color:#f85149">Failed to load: ${err.message}</p>`;
+    }
+  }
+
+  await refreshLog();
+  const interval = setInterval(refreshLog, 10000);
+  // Clean up interval when overlay is removed
+  const observer = new MutationObserver(() => {
+    if (!document.body.contains(overlay)) {
+      clearInterval(interval);
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true });
 }
 
 async function openSettings() {
