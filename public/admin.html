@@ -379,6 +379,13 @@ body{
   display:flex;gap:.6rem;justify-content:flex-end;margin-top:.5rem;
 }
 </style>
+<script>
+// Zoom scaling for high-res displays (same as dashboard)
+(function(){
+  var z = screen.width / 1920;
+  if (z > 1) document.documentElement.style.zoom = z;
+})();
+</script>
 </head>
 <body>
 
