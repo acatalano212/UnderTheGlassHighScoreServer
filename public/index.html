@@ -466,6 +466,27 @@ body{
   font-family:'Oswald',sans-serif;
   font-weight:700;
 }
+/* JSPL promo callout */
+.detail-jspl-promo{
+  background:rgba(218,165,32,.06);
+  border:1px solid rgba(218,165,32,.22);
+  border-radius:8px;
+  padding:1rem 1.2rem;
+  margin-top:.6rem;
+  text-align:center;
+}
+.detail-jspl-promo-title{
+  margin-bottom:.6rem;
+}
+.detail-jspl-promo-title img{
+  height:50px;width:auto;
+  filter:drop-shadow(0 0 6px rgba(218,165,32,.4));
+}
+.detail-jspl-promo-text{
+  font-size:1.2rem;color:#ccc;line-height:1.55;
+  font-family:'Oswald',sans-serif;
+  font-weight:700;
+}
 /* Side-by-side leaderboards */
 .lb-columns{
   display:flex;gap:1.2rem;padding:0.8rem 1rem 0;
@@ -584,6 +605,8 @@ body{
   .detail-funfact-title{font-size:.95rem}
   .detail-promo-text{font-size:1.05rem}
   .detail-promo-title img{height:30px}
+  .detail-jspl-promo-text{font-size:1.05rem}
+  .detail-jspl-promo-title img{height:38px}
   /* Banner responsive */
   .banner{padding:.5rem 1rem}
   .brand-logo{max-height:40px !important}
@@ -1343,6 +1366,15 @@ const PROMO_TAGLINES = [
   'Ready to play at home? Ask us about buying or renting this game!',
 ];
 
+// Rotating JSPL promo taglines
+const JSPL_TAGLINES = [
+  'Join the Jersey Shore Pinball League — Rookie & Pro divisions now forming!',
+  'Think you\'ve got game? Prove it in the Jersey Shore Pinball League!',
+  'JSPL is coming! Two divisions, one epic league — sign up today.',
+  'From first-timers to flipper pros — the Jersey Shore Pinball League has a spot for you.',
+  'The most fun nights on the Jersey Shore start here — join the JSPL!',
+];
+
 function showDetail(gameName, isAutoCycle) {
   // Pause carousel (but not during auto detail-cycle)
   if (!isAutoCycle && carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
@@ -1497,6 +1529,12 @@ function showDetail(gameName, isAutoCycle) {
   html += '<div class="detail-promo">';
   html += '<div class="detail-promo-title"><img src="static/utg-logo.png" alt="Under the Glass"></div>';
   html += `<div class="detail-promo-text">${escapeHtml(promo)}</div>`;
+  html += '</div>';
+  // JSPL promo
+  const jsplPromo = JSPL_TAGLINES[Math.floor(Math.random() * JSPL_TAGLINES.length)];
+  html += '<div class="detail-jspl-promo">';
+  html += '<div class="detail-jspl-promo-title"><img src="static/jspl-logo.png" alt="Jersey Shore Pinball League"></div>';
+  html += `<div class="detail-jspl-promo-text">${escapeHtml(jsplPromo)}</div>`;
   html += '</div>';
   html += '</div>'; // end detail-about
 
