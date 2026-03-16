@@ -816,6 +816,15 @@ async function openSettings() {
     <div class="settings-panel">
       <h2>⚙️ Settings <button class="settings-close" onclick="this.closest('.settings-overlay').remove()">✕</button></h2>
 
+      <h3>🎯 Stern Insider Connected</h3>
+      <div class="wifi-pw-modal" style="margin-top:0">
+        <label>Event Code</label>
+        <input type="text" id="sternEventCode" placeholder="e.g. VaTQ-MRMSP-uJe" style="font-family:'Roboto Mono',monospace">
+        <div class="wifi-pw-actions">
+          <button class="btn btn-primary" onclick="saveSternCode()">Save & Reload</button>
+        </div>
+      </div>
+
       <h3>📶 WiFi Status</h3>
       <div class="wifi-status" id="wifiStatus">
         <div class="ws-label">Loading...</div>
@@ -841,6 +850,7 @@ async function openSettings() {
   loadWifiStatus();
   loadSavedNetworks();
   loadSystemInfo();
+  loadConfig();
 }
 
 async function loadWifiStatus() {
@@ -982,6 +992,39 @@ async function loadSystemInfo() {
     `;
   } catch {
     el.innerHTML = '<div class="si-label">Error</div><div class="si-value">Could not load system info</div>';
+  }
+}
+
+async function loadConfig() {
+  const el = document.getElementById('sternEventCode');
+  if (!el) return;
+  try {
+    const resp = await fetch('/api/config');
+    const data = await resp.json();
+    el.value = data.sternEventCode || '';
+  } catch {}
+}
+
+async function saveSternCode() {
+  const el = document.getElementById('sternEventCode');
+  if (!el) return;
+  const code = el.value.trim();
+  if (!code) { el.style.borderColor = '#f85149'; return; }
+  try {
+    const resp = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sternEventCode: code }),
+    });
+    if (resp.ok) {
+      showToast('Stern event code updated! Reloading scores...');
+      await loadGames();
+      if (selectedGame) selectGame(selectedGame);
+    } else {
+      showToast('Failed to save config', true);
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, true);
   }
 }
 </script>

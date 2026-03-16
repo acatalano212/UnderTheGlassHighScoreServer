@@ -35,6 +35,22 @@ const SCORES_FILE = join(DATA_DIR, "scores.json");
 // Ensure data directory exists
 if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
 
+// Runtime config (persisted to data/config.json)
+const CONFIG_FILE = join(DATA_DIR, "config.json");
+
+function loadConfig() {
+  try {
+    if (existsSync(CONFIG_FILE)) return JSON.parse(readFileSync(CONFIG_FILE, "utf-8"));
+  } catch {}
+  return {};
+}
+
+function saveConfig(cfg) {
+  writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), "utf-8");
+}
+
+let runtimeConfig = loadConfig();
+
 // ---------------------------------------------------------------------------
 // Score persistence
 // ---------------------------------------------------------------------------
@@ -287,7 +303,7 @@ async function cachedGet(url, key) {
 }
 
 async function loadSternData() {
-  const eventCode = process.env.STERN_EVENT_CODE || "VaTQ-MRMSP-uJe";
+  const eventCode = runtimeConfig.sternEventCode || process.env.STERN_EVENT_CODE || "VaTQ-MRMSP-uJe";
   const lbUrl = `${STERN_LEADERBOARD_URL}?event_code=${eventCode}&event_state=current`;
 
   const [lbJson, titlesJson] = await Promise.all([
@@ -474,6 +490,29 @@ app.put("/api/scores/:machineId", (req, res) => {
   saveScores(jjpScores);
 
   res.json({ status: "ok", machine_id: machineId });
+});
+
+// ---------------------------------------------------------------------------
+// Config API (admin settings)
+// ---------------------------------------------------------------------------
+
+// GET /api/config — get runtime config
+app.get("/api/config", (req, res) => {
+  res.json({
+    sternEventCode: runtimeConfig.sternEventCode || process.env.STERN_EVENT_CODE || "VaTQ-MRMSP-uJe",
+  });
+});
+
+// PUT /api/config — update runtime config
+app.put("/api/config", (req, res) => {
+  const body = req.body;
+  if (body.sternEventCode !== undefined) {
+    runtimeConfig.sternEventCode = body.sternEventCode.trim();
+    // Clear Stern cache so next fetch uses new code
+    delete sternCache["stern_lb"];
+  }
+  saveConfig(runtimeConfig);
+  res.json({ status: "ok", config: runtimeConfig });
 });
 
 // ---------------------------------------------------------------------------
