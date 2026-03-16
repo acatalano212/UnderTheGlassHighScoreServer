@@ -533,9 +533,10 @@ function renderCard(name, game) {
   if (subtitle) html += `<div class="subtitle-text">${escapeHtml(subtitle)}</div>`;
   html += '</div></div></div>';
 
-  // Scores
+  // Scores — use all-time scores when in alltime mode
   html += '<div class="scores-list">';
-  const scores = (game.scores || []).slice(0, 5);
+  const scoreSource = displayMode === 'alltime' ? (game.alltime_scores || game.scores) : game.scores;
+  const scores = (scoreSource || []).slice(0, 5);
   const theme = getTheme(name);
   scores.forEach((s, i) => {
     const allAccess = s.is_all_access ? ' all-access' : '';
@@ -560,6 +561,10 @@ let carouselTimer = null;
 let currentPage = 0;
 let totalPages = 0;
 let allGamesData = {}; // store for detail view
+let displayMode = 'monthly'; // monthly | alltime | detail-cycle
+let detailCycleTimer = null;
+let detailCycleIndex = 0;
+let sortedGameKeys = [];
 
 function chunkArray(arr, size) {
   const chunks = [];
@@ -595,9 +600,9 @@ function startCarousel() {
   }, 5000);
 }
 
-function showDetail(gameName) {
-  // Pause carousel
-  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+function showDetail(gameName, isAutoCycle) {
+  // Pause carousel (but not during auto detail-cycle)
+  if (!isAutoCycle && carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
 
   // Find the game data by key
   const entry = Object.entries(allGamesData).find(([k]) => k === gameName);
@@ -611,7 +616,7 @@ function showDetail(gameName) {
   const displayName = game.display_name || name;
   const subtitle = buildSubtitle(game);
 
-  let html = '<div class="detail-back" onclick="hideDetail()">← Back to Leaderboard</div>';
+  let html = isAutoCycle ? '' : '<div class="detail-back" onclick="hideDetail()">← Back to Leaderboard</div>';
   html += '<div class="detail-card">';
 
   // Header
@@ -699,21 +704,49 @@ function showDetail(gameName) {
 }
 
 function hideDetail() {
+  stopDetailCycle();
   document.getElementById('detail-view').style.display = 'none';
   document.getElementById('carousel-container').style.display = '';
   document.getElementById('carousel-dots').style.display = '';
   startCarousel();
 }
 
+function stopDetailCycle() {
+  if (detailCycleTimer) { clearInterval(detailCycleTimer); detailCycleTimer = null; }
+}
+
+function startDetailCycle() {
+  stopDetailCycle();
+  if (sortedGameKeys.length === 0) return;
+  detailCycleIndex = 0;
+  showDetail(sortedGameKeys[0], true);
+  detailCycleTimer = setInterval(() => {
+    detailCycleIndex = (detailCycleIndex + 1) % sortedGameKeys.length;
+    showDetail(sortedGameKeys[detailCycleIndex], true);
+  }, 10000);
+}
+
 async function loadDashboard() {
   try {
+    // Fetch config for display mode
+    try {
+      const cfgResp = await fetch('/api/config');
+      const cfgData = await cfgResp.json();
+      displayMode = cfgData.displayMode || 'monthly';
+    } catch {}
+
     const resp = await fetch('/api/scores');
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
 
-    // Update banner
-    document.getElementById('lb-title').textContent = data.leaderboard?.title || 'Leaderboard';
-    document.getElementById('date-range').textContent = data.leaderboard?.date_range || '';
+    // Update banner based on mode
+    const modeLabels = {
+      'monthly': data.leaderboard?.title || 'Leaderboard',
+      'alltime': 'All Time Leaderboard',
+      'detail-cycle': 'Leaderboard',
+    };
+    document.getElementById('lb-title').textContent = modeLabels[displayMode] || data.leaderboard?.title;
+    document.getElementById('date-range').textContent = displayMode === 'monthly' ? (data.leaderboard?.date_range || '') : '';
 
     // Collect all game cards — alphabetical order
     const games = data.games || {};
@@ -721,41 +754,56 @@ async function loadDashboard() {
     const sorted = Object.entries(games).sort(([kA, a], [kB, b]) => {
       return (a.display_name || kA).localeCompare(b.display_name || kB);
     });
+    sortedGameKeys = sorted.map(([k]) => k);
 
-    // Build card HTML for each game
-    const cards = sorted.map(([name, game]) => renderCard(name, game));
-
-    // Chunk into pages of 4
-    const pages = chunkArray(cards, 4);
-    totalPages = pages.length;
-
-    // Build carousel HTML
-    const container = document.getElementById('carousel-container');
-    let html = '';
-    pages.forEach((page, i) => {
-      html += `<div class="carousel-page${i === 0 ? ' active' : ''}">`;
-      html += page.join('');
-      html += '</div>';
-    });
-    container.innerHTML = html || '<div class="loading">No games found</div>';
-
-    // Build dots (desktop only)
-    const dotsContainer = document.getElementById('carousel-dots');
-    if (window.innerWidth > 900) {
-      let dotsHtml = '';
-      for (let i = 0; i < totalPages; i++) {
-        dotsHtml += `<div class="carousel-dot${i === 0 ? ' active' : ''}" onclick="showPage(${i}); startCarousel();"></div>`;
-      }
-      dotsContainer.innerHTML = dotsHtml;
+    // Detail-cycle mode: auto-rotate through detail pages
+    if (displayMode === 'detail-cycle') {
+      document.getElementById('carousel-container').style.display = 'none';
+      document.getElementById('carousel-dots').style.display = 'none';
+      if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+      startDetailCycle();
     } else {
-      dotsContainer.innerHTML = '';
-      dotsContainer.style.display = 'none';
-    }
+      // Carousel mode (monthly or alltime)
+      stopDetailCycle();
+      document.getElementById('detail-view').style.display = 'none';
+      document.getElementById('carousel-container').style.display = '';
+      document.getElementById('carousel-dots').style.display = '';
 
-    // Start carousel (desktop only)
-    currentPage = 0;
-    if (window.innerWidth > 900) {
-      startCarousel();
+      // Build card HTML for each game
+      const cards = sorted.map(([name, game]) => renderCard(name, game));
+
+      // Chunk into pages of 4
+      const pages = chunkArray(cards, 4);
+      totalPages = pages.length;
+
+      // Build carousel HTML
+      const container = document.getElementById('carousel-container');
+      let html = '';
+      pages.forEach((page, i) => {
+        html += `<div class="carousel-page${i === 0 ? ' active' : ''}">`;
+        html += page.join('');
+        html += '</div>';
+      });
+      container.innerHTML = html || '<div class="loading">No games found</div>';
+
+      // Build dots (desktop only)
+      const dotsContainer = document.getElementById('carousel-dots');
+      if (window.innerWidth > 900) {
+        let dotsHtml = '';
+        for (let i = 0; i < totalPages; i++) {
+          dotsHtml += `<div class="carousel-dot${i === 0 ? ' active' : ''}" onclick="showPage(${i}); startCarousel();"></div>`;
+        }
+        dotsContainer.innerHTML = dotsHtml;
+      } else {
+        dotsContainer.innerHTML = '';
+        dotsContainer.style.display = 'none';
+      }
+
+      // Start carousel (desktop only)
+      currentPage = 0;
+      if (window.innerWidth > 900) {
+        startCarousel();
+      }
     }
 
     // Update footer

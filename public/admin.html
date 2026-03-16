@@ -924,6 +924,19 @@ async function openSettings() {
     <div class="settings-panel">
       <h2>⚙️ Settings <button class="settings-close" onclick="this.closest('.settings-overlay').remove()">✕</button></h2>
 
+      <h3>🖥️ Display Mode</h3>
+      <div class="wifi-pw-modal" style="margin-top:0">
+        <label>Kiosk View</label>
+        <select id="displayMode" style="width:100%;padding:.5rem;background:#161b22;color:#e6edf3;border:1px solid #30363d;border-radius:6px;font-size:.85rem">
+          <option value="monthly">Monthly Leaderboard</option>
+          <option value="alltime">All Time Leaderboard</option>
+          <option value="detail-cycle">Leaderboard (Game Details Cycle)</option>
+        </select>
+        <div class="wifi-pw-actions">
+          <button class="btn btn-primary" onclick="saveDisplayMode()">Save</button>
+        </div>
+      </div>
+
       <h3>🎯 Stern Insider Connected</h3>
       <div class="wifi-pw-modal" style="margin-top:0">
         <label>Event Code</label>
@@ -1105,12 +1118,32 @@ async function loadSystemInfo() {
 
 async function loadConfig() {
   const el = document.getElementById('sternEventCode');
-  if (!el) return;
+  const modeEl = document.getElementById('displayMode');
   try {
     const resp = await fetch('/api/config');
     const data = await resp.json();
-    el.value = data.sternEventCode || '';
+    if (el) el.value = data.sternEventCode || '';
+    if (modeEl) modeEl.value = data.displayMode || 'monthly';
   } catch {}
+}
+
+async function saveDisplayMode() {
+  const el = document.getElementById('displayMode');
+  if (!el) return;
+  try {
+    const resp = await fetch('/api/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ displayMode: el.value }),
+    });
+    if (resp.ok) {
+      showToast('Display mode updated! Dashboard will refresh automatically.');
+    } else {
+      showToast('Failed to save display mode', true);
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, true);
+  }
 }
 
 async function saveSternCode() {

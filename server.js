@@ -840,6 +840,7 @@ app.put("/api/scores/:machineId", (req, res) => {
 app.get("/api/config", (req, res) => {
   res.json({
     sternEventCode: runtimeConfig.sternEventCode || process.env.STERN_EVENT_CODE || "VaTQ-MRMSP-uJe",
+    displayMode: runtimeConfig.displayMode || "monthly",
   });
 });
 
@@ -850,6 +851,12 @@ app.put("/api/config", (req, res) => {
     runtimeConfig.sternEventCode = body.sternEventCode.trim();
     // Clear Stern cache so next fetch uses new code
     delete sternCache["stern_lb"];
+  }
+  if (body.displayMode !== undefined) {
+    const valid = ["monthly", "alltime", "detail-cycle"];
+    if (valid.includes(body.displayMode)) {
+      runtimeConfig.displayMode = body.displayMode;
+    }
   }
   saveConfig(runtimeConfig);
   logActivity("config_change", { ip: req.ip, changes: Object.keys(req.body) });
