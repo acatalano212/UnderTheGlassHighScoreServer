@@ -144,8 +144,8 @@ function mergeAllTime(gameKey, newScores, gameMeta) {
     }
   }
 
-  // Sort and keep top 10
-  const sorted = [...byPlayer.values()].sort((a, b) => b.score - a.score).slice(0, 10);
+  // Sort and keep top 11 (Grand Champion + 1-10)
+  const sorted = [...byPlayer.values()].sort((a, b) => b.score - a.score).slice(0, 11);
 
   allTimeScores[gameKey] = {
     display_name: gameMeta?.display_name || existing.display_name || gameKey,
@@ -164,6 +164,221 @@ if (jjpScores.size === 0) {
   seedMockScores();
   saveScores(jjpScores);
   console.log("Seeded initial scores to", SCORES_FILE);
+}
+
+// Seed fake all-time data so the boards look different from monthly
+if (Object.keys(allTimeScores).length === 0) {
+  seedAllTimeData();
+  console.log("Seeded all-time scores to", ALLTIME_FILE);
+}
+
+function seedAllTimeData() {
+  const fakeAllTime = {
+    "jjp-hp-we": {
+      display_name: "Harry Potter (Wizard Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "DUMBLEDRE", score: 1245890300 }, { username: "ANTHONY", score: 987654200 },
+        { username: "SIRIUS", score: 834560100 }, { username: "GINNY", score: 756320400 },
+        { username: "LUPIN", score: 678450200 }, { username: "VOLDEMRT", score: 612340500 },
+        { username: "TONKS", score: 534890100 }, { username: "HAGRID", score: 467230300 },
+        { username: "DOBBY", score: 389760200 }, { username: "BELLATRIX", score: 312450600 },
+        { username: "NEVILLE", score: 278340100 },
+      ],
+    },
+    "jjp-hp-ce": {
+      display_name: "Harry Potter (Collectors Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "HARRY", score: 876540300 }, { username: "HERMIONE", score: 745230100 },
+        { username: "RON", score: 634890200 }, { username: "DUMBLEDRE", score: 567230400 },
+        { username: "SNAPE", score: 489560100 }, { username: "MCGONAGAL", score: 412340200 },
+        { username: "HAGRID", score: 345670300 }, { username: "ANTHONY", score: 298760100 },
+        { username: "DOBBY", score: 234560400 }, { username: "NEVILLE", score: 198430200 },
+        { username: "LUNA", score: 176540100 },
+      ],
+    },
+    "jjp-avatar": {
+      display_name: "Avatar (Collectors Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "NEYTIRI", score: 1456780200 }, { username: "JAKE", score: 1234560100 },
+        { username: "TORUK", score: 987430400 }, { username: "QUARITCH", score: 834560200 },
+        { username: "GRACE", score: 712340100 }, { username: "TSUTY", score: 623450300 },
+        { username: "MOAT", score: 534890200 }, { username: "ANTHONY", score: 467230100 },
+        { username: "NORM", score: 398760400 }, { username: "TRUDY", score: 345670200 },
+        { username: "EYTUKAN", score: 289430100 },
+      ],
+    },
+    "jjp-godfather": {
+      display_name: "The Godfather (Collectors Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "VITO", score: 1567890300 }, { username: "MICHAEL", score: 1234560100 },
+        { username: "ANTHONY", score: 987430200 }, { username: "SONNY", score: 845670400 },
+        { username: "TOM", score: 712340100 }, { username: "FREDO", score: 634890300 },
+        { username: "KAY", score: 534560200 }, { username: "CONNIE", score: 467230100 },
+        { username: "CLEMENZA", score: 389760400 }, { username: "TESSIO", score: 312340200 },
+        { username: "CARLO", score: 278560100 },
+      ],
+    },
+    "jjp-toystory4": {
+      display_name: "Toy Story 4 (Collectors Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "BUZZ", score: 1123450200 }, { username: "WOODY", score: 967890100 },
+        { username: "BONNIE", score: 812340400 }, { username: "FORKY", score: 678560200 },
+        { username: "BOPEP", score: 556780100 }, { username: "JESSIE", score: 467890300 },
+        { username: "ANTHONY", score: 412340200 }, { username: "REX", score: 356780100 },
+        { username: "HAMM", score: 298450400 }, { username: "SLINKY", score: 234560200 },
+        { username: "DUCKY", score: 198730100 },
+      ],
+    },
+    "jjp-eltonjohn": {
+      display_name: "Elton John (Collectors Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "ELTON", score: 1678900100 }, { username: "ROCKET", score: 1345670200 },
+        { username: "BERNIE", score: 1098760400 }, { username: "DANCER", score: 923450100 },
+        { username: "CROC", score: 812340300 }, { username: "CAPTAIN", score: 712560200 },
+        { username: "ANTHONY", score: 634890100 }, { username: "TARON", score: 567230400 },
+        { username: "ISLAND", score: 489560200 }, { username: "BENNIE", score: 412340100 },
+        { username: "PINBALL", score: 356780300 },
+      ],
+    },
+    "jjp-potc": {
+      display_name: "Pirates of the Caribbean (Collectors Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "JACK", score: 1456780200 }, { username: "BARBOSSA", score: 1198760100 },
+        { username: "WILL", score: 978430400 }, { username: "ELIZABETH", score: 834560200 },
+        { username: "DAVY", score: 712340100 }, { username: "ANTHONY", score: 634890300 },
+        { username: "GIBBS", score: 534560200 }, { username: "TIADALMA", score: 467230100 },
+        { username: "NORRINGTN", score: 389760400 }, { username: "RAGETTI", score: 312340200 },
+        { username: "PINTEL", score: 267890100 },
+      ],
+    },
+    "jjp-gnr": {
+      display_name: "Guns N' Roses (Limited Edition)", manufacturer: "Jersey Jack Pinball",
+      scores: [
+        { username: "SLASH", score: 1567890200 }, { username: "AXL", score: 1345670100 },
+        { username: "DUFF", score: 1098760400 }, { username: "IZZY", score: 923450200 },
+        { username: "STEVEN", score: 812340100 }, { username: "ANTHONY", score: 734560300 },
+        { username: "DIZZY", score: 634890200 }, { username: "GILBY", score: 534560100 },
+        { username: "MATT", score: 467230400 }, { username: "BUCKHD", score: 389560200 },
+        { username: "BUMBLFT", score: 312340100 },
+      ],
+    },
+    "bof-wmh": {
+      display_name: "Winchester Mystery House", manufacturer: "Barrels of Fun",
+      scores: [
+        { username: "SARAH", score: 1234560100 }, { username: "SPIRIT", score: 978430200 },
+        { username: "GHOST", score: 812340400 }, { username: "HAUNT", score: 678560100 },
+        { username: "SEANCE", score: 534890300 }, { username: "ANTHONY", score: 467230200 },
+        { username: "SPECTER", score: 389760100 }, { username: "PHANTOM", score: 312340400 },
+        { username: "MEDIUM", score: 267890200 }, { username: "WRAITH", score: 198560100 },
+        { username: "GHOUL", score: 156780300 },
+      ],
+    },
+    "spooky-bj": {
+      display_name: "Beetlejuice", manufacturer: "Spooky Pinball",
+      scores: [
+        { username: "BEETLE", score: 1345670200 }, { username: "LYDIA", score: 1098760100 },
+        { username: "ADAM", score: 912340400 }, { username: "BARB", score: 778430200 },
+        { username: "DELIA", score: 634560100 }, { username: "OTHO", score: 534890300 },
+        { username: "ANTHONY", score: 467230200 }, { username: "JUNO", score: 389760100 },
+        { username: "MAXIE", score: 312340400 }, { username: "BERYL", score: 267890200 },
+        { username: "SANDWORM", score: 198560100 },
+      ],
+    },
+    "stern-dnd": {
+      display_name: "Dungeons & Dragons (Pro)", manufacturer: "Stern Pinball",
+      scores: [
+        { username: "WIZARD", score: 1567890200 }, { username: "RANGER", score: 1234560100 },
+        { username: "PALADIN", score: 1098760400 }, { username: "ROGUE", score: 923450200 },
+        { username: "CLERIC", score: 812340100 }, { username: "BARD", score: 712560300 },
+        { username: "WARLOCK", score: 634890200 }, { username: "MONK", score: 534560100 },
+        { username: "FIGHTER", score: 467230400 }, { username: "DRUID", score: 389560200 },
+        { username: "ANTHONY", score: 312340100 },
+      ],
+    },
+    "stern-pokemon": {
+      display_name: "Pokémon (Limited Edition)", manufacturer: "Stern Pinball",
+      scores: [
+        { username: "PIKACHU", score: 1678900100 }, { username: "ASH", score: 1456780200 },
+        { username: "CHARIZRD", score: 1234560400 }, { username: "MISTY", score: 1098760100 },
+        { username: "BROCK", score: 923450300 }, { username: "GARY", score: 812340200 },
+        { username: "MEWTO", score: 712560100 }, { username: "ANTHONY", score: 634890400 },
+        { username: "EEVEE", score: 534560200 }, { username: "SNORLAX", score: 467230100 },
+        { username: "GENGAR", score: 389560300 },
+      ],
+    },
+    "cgc-mm": {
+      display_name: "Medieval Madness (Merlin Edition)", manufacturer: "Chicago Gaming",
+      scores: [
+        { username: "MERLIN", score: 2345670200 }, { username: "KNIGHT", score: 1987430100 },
+        { username: "DRAGON", score: 1567890400 }, { username: "KING", score: 1234560200 },
+        { username: "TROLL", score: 1098760100 }, { username: "QUEEN", score: 923450300 },
+        { username: "ANTHONY", score: 812340200 }, { username: "SQUIRE", score: 712560100 },
+        { username: "WIZARD", score: 634890400 }, { username: "JESTER", score: 534560200 },
+        { username: "ARCHER", score: 467230100 },
+      ],
+    },
+    "bof-dune": {
+      display_name: "Dune", manufacturer: "Barrels of Fun",
+      scores: [
+        { username: "PAUL", score: 1567890200 }, { username: "CHANI", score: 1345670100 },
+        { username: "STILGAR", score: 1098760400 }, { username: "JESSICA", score: 923450200 },
+        { username: "LETO", score: 812340100 }, { username: "DUNCAN", score: 712560300 },
+        { username: "ANTHONY", score: 634890200 }, { username: "ALIA", score: 534560100 },
+        { username: "GURNEY", score: 467230400 }, { username: "FEYD", score: 389560200 },
+        { username: "BARON", score: 312340100 },
+      ],
+    },
+    "stern-metallica": {
+      display_name: "Metallica Remastered (Premium)", manufacturer: "Stern Pinball",
+      scores: [
+        { username: "JAMES", score: 2123450200 }, { username: "LARS", score: 1834560100 },
+        { username: "KIRK", score: 1567890400 }, { username: "ROB", score: 1234560200 },
+        { username: "CLIFF", score: 1098760100 }, { username: "ANTHONY", score: 923450300 },
+        { username: "JASON", score: 812340200 }, { username: "DAVE", score: 712560100 },
+        { username: "METAL", score: 634890400 }, { username: "THRASH", score: 534560200 },
+        { username: "MASTER", score: 467230100 },
+      ],
+    },
+    "stern-godzilla": {
+      display_name: "Godzilla (Premium)", manufacturer: "Stern Pinball",
+      scores: [
+        { username: "GOJIRA", score: 2567890200 }, { username: "MOTHRA", score: 2123450100 },
+        { username: "RODAN", score: 1834560400 }, { username: "GHIDRA", score: 1567890200 },
+        { username: "KONG", score: 1234560100 }, { username: "MECHAG", score: 1098760300 },
+        { username: "ANTHONY", score: 923450200 }, { username: "ANGUIR", score: 812340100 },
+        { username: "BIOLLNT", score: 712560400 }, { username: "BATTRA", score: 634890200 },
+        { username: "DESTROYAH", score: 534560100 },
+      ],
+    },
+    "stern-jaws": {
+      display_name: "Jaws (50th Anniversary Edition)", manufacturer: "Stern Pinball",
+      scores: [
+        { username: "BRODY", score: 1789560200 }, { username: "QUINT", score: 1456780100 },
+        { username: "HOOPER", score: 1234560400 }, { username: "ELLEN", score: 1098760200 },
+        { username: "SHARK", score: 923450100 }, { username: "MAYOR", score: 812340300 },
+        { username: "ANTHONY", score: 712560200 }, { username: "CHRISSIE", score: 634890100 },
+        { username: "VAUGHN", score: 534560400 }, { username: "PIPPIT", score: 467230200 },
+        { username: "KINTNER", score: 389560100 },
+      ],
+    },
+  };
+
+  for (const [key, data] of Object.entries(fakeAllTime)) {
+    allTimeScores[key] = {
+      display_name: data.display_name,
+      manufacturer: data.manufacturer,
+      scores: data.scores.map((s, i) => ({
+        username: s.username,
+        avatar_path: "",
+        background_color_hex: JJP_COLORS[i % JJP_COLORS.length],
+        score: s.score,
+        is_all_access: false,
+        first_seen: new Date(Date.now() - Math.random() * 90 * 86400000).toISOString(),
+      })),
+      updated: new Date().toISOString(),
+    };
+  }
+  saveAllTime(allTimeScores);
 }
 
 // ---------------------------------------------------------------------------
