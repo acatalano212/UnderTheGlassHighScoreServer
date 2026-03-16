@@ -455,13 +455,16 @@ body{
   text-align:center;
 }
 .detail-promo-title{
-  font-size:1.05rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:.1em;color:#2ecc71;margin-bottom:.4rem;
-  font-family:'Oswald',sans-serif;
+  margin-bottom:.6rem;
+}
+.detail-promo-title img{
+  height:40px;width:auto;
+  filter:drop-shadow(0 0 4px rgba(255,255,255,.3));
 }
 .detail-promo-text{
-  font-size:1.05rem;color:#ccc;line-height:1.55;
+  font-size:1.2rem;color:#ccc;line-height:1.55;
   font-family:'Oswald',sans-serif;
+  font-weight:700;
 }
 /* Side-by-side leaderboards */
 .lb-columns{
@@ -579,8 +582,8 @@ body{
   .detail-about-desc{font-size:1rem}
   .detail-funfact-text{font-size:.95rem}
   .detail-funfact-title{font-size:.95rem}
-  .detail-promo-text{font-size:.95rem}
-  .detail-promo-title{font-size:.95rem}
+  .detail-promo-text{font-size:1.05rem}
+  .detail-promo-title img{height:30px}
   /* Banner responsive */
   .banner{padding:.5rem 1rem}
   .brand-logo{max-height:40px !important}
@@ -1492,7 +1495,7 @@ function showDetail(gameName, isAutoCycle) {
   // Buy/Rent promo
   const promo = PROMO_TAGLINES[Math.floor(Math.random() * PROMO_TAGLINES.length)];
   html += '<div class="detail-promo">';
-  html += '<div class="detail-promo-title">🎯 Own or Rent</div>';
+  html += '<div class="detail-promo-title"><img src="static/utg-logo.png" alt="Under the Glass"></div>';
   html += `<div class="detail-promo-text">${escapeHtml(promo)}</div>`;
   html += '</div>';
   html += '</div>'; // end detail-about
