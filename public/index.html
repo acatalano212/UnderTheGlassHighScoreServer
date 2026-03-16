@@ -1465,8 +1465,9 @@ function showDetail(gameName, isAutoCycle) {
   const detailView = document.getElementById('detail-view');
   detailView.innerHTML = html;
   detailView.style.display = 'block';
-  // Track current game name for swipe
+  // Track current game and cycle state for swipe
   detailView.dataset.currentGame = name;
+  detailView.dataset.autoCycle = isAutoCycle ? 'true' : 'false';
 }
 
 // Mobile leaderboard tab toggle
@@ -1506,9 +1507,11 @@ function switchLbTab(el) {
     }
     // Stop auto-cycle if running
     stopDetailCycle();
+    // Preserve the isAutoCycle state from current view
+    const wasAutoCycle = dv.dataset.autoCycle === 'true';
     dv.classList.add('fading');
     setTimeout(() => {
-      showDetail(sortedGameKeys[nextIdx], false);
+      showDetail(sortedGameKeys[nextIdx], wasAutoCycle);
       dv.classList.remove('fading');
     }, 300);
   }, { passive: true });
@@ -1635,10 +1638,13 @@ async function loadDashboard() {
   }
 }
 
-// Click delegation for game cards (handles special chars in names)
+// Click delegation for game cards (disabled on mobile — use swipe instead)
 document.addEventListener('click', (e) => {
   const card = e.target.closest('.game-card');
-  if (card && card.dataset.game) showDetail(card.dataset.game);
+  if (card && card.dataset.game) {
+    if (window.innerWidth <= 900) return;
+    showDetail(card.dataset.game);
+  }
 });
 
 // Initial load + auto-refresh
