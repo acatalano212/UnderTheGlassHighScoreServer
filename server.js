@@ -53,6 +53,7 @@ function logActivity(type, detail) {
 
 const DATA_DIR = join(__dirname, "data");
 const SCORES_FILE = join(DATA_DIR, "scores.json");
+const ALLTIME_FILE = join(DATA_DIR, "alltime.json");
 
 // Ensure data directory exists
 if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
@@ -94,6 +95,65 @@ function loadScores() {
 function saveScores(scoresMap) {
   const obj = Object.fromEntries(scoresMap);
   writeFileSync(SCORES_FILE, JSON.stringify(obj, null, 2), "utf-8");
+}
+
+// ---------------------------------------------------------------------------
+// All-time score tracking
+// ---------------------------------------------------------------------------
+
+function loadAllTime() {
+  try {
+    if (existsSync(ALLTIME_FILE)) {
+      return JSON.parse(readFileSync(ALLTIME_FILE, "utf-8"));
+    }
+  } catch (e) {
+    console.warn("Failed to load alltime scores:", e.message);
+  }
+  return {};
+}
+
+function saveAllTime(data) {
+  writeFileSync(ALLTIME_FILE, JSON.stringify(data, null, 2), "utf-8");
+}
+
+let allTimeScores = loadAllTime();
+
+// Merge scores into all-time leaderboard for a game.
+// Keeps top 10 unique players by highest score ever seen.
+function mergeAllTime(gameKey, newScores, gameMeta) {
+  const existing = allTimeScores[gameKey] || { scores: [] };
+  const byPlayer = new Map();
+
+  // Load existing all-time scores
+  for (const s of existing.scores || []) {
+    byPlayer.set(s.username, s);
+  }
+
+  // Merge new scores — keep the higher score per player
+  for (const s of newScores) {
+    const prev = byPlayer.get(s.username);
+    if (!prev || s.score > prev.score) {
+      byPlayer.set(s.username, {
+        username: s.username,
+        avatar_path: s.avatar_path || prev?.avatar_path || "",
+        background_color_hex: s.background_color_hex || prev?.background_color_hex || "#888",
+        score: s.score,
+        is_all_access: s.is_all_access || false,
+        first_seen: prev?.first_seen || new Date().toISOString(),
+      });
+    }
+  }
+
+  // Sort and keep top 10
+  const sorted = [...byPlayer.values()].sort((a, b) => b.score - a.score).slice(0, 10);
+
+  allTimeScores[gameKey] = {
+    display_name: gameMeta?.display_name || existing.display_name || gameKey,
+    manufacturer: gameMeta?.manufacturer || existing.manufacturer || "",
+    scores: sorted,
+    updated: new Date().toISOString(),
+  };
+  saveAllTime(allTimeScores);
 }
 
 const JJP_COLORS = ["#740001","#ae0001","#eeba30","#1a472a","#2a623d","#222f5b","#5d5d5d"];
@@ -398,8 +458,12 @@ async function loadSternData() {
       });
     }
 
-    for (const g of Object.values(games)) {
+    for (const [gname, g] of Object.entries(games)) {
       g.scores.sort((a, b) => b.score - a.score);
+      mergeAllTime(gname, g.scores, {
+        display_name: g.display_name,
+        manufacturer: "Stern Pinball",
+      });
     }
   }
 
@@ -438,12 +502,19 @@ app.get("/api/scores", async (req, res) => {
   const now = new Date();
   const monthName = now.toLocaleString("en-US", { month: "long" });
 
+  // Attach all-time scores to each game
+  const games = { ...jjpGames, ...sternGames };
+  for (const [key, game] of Object.entries(games)) {
+    const at = allTimeScores[key];
+    game.alltime_scores = at?.scores || game.scores || [];
+  }
+
   res.json({
     leaderboard: {
       title: `${monthName} ${now.getFullYear()} Leaderboard`,
       date_range: `${monthName}-1 to ${monthName} 31st`,
     },
-    games: { ...jjpGames, ...sternGames },
+    games,
     updated: now.toISOString(),
   });
 });
@@ -496,6 +567,10 @@ app.post("/api/scores", (req, res) => {
   });
 
   saveScores(jjpScores);
+  mergeAllTime(machineId, scores, {
+    display_name: body.game || existing.game || "Unknown",
+    manufacturer: body.manufacturer || existing.manufacturer || "Jersey Jack Pinball",
+  });
   logActivity("xiao_score", {
     game: body.game || "Unknown",
     machineId,
@@ -527,6 +602,12 @@ app.put("/api/scores/:machineId", (req, res) => {
 
   jjpScores.set(machineId, existing);
   saveScores(jjpScores);
+  if (existing.scores) {
+    mergeAllTime(machineId, existing.scores, {
+      display_name: existing.game || machineId,
+      manufacturer: existing.manufacturer || "Jersey Jack Pinball",
+    });
+  }
   logActivity("admin_edit", {
     game: existing.game || machineId,
     machineId,

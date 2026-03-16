@@ -316,6 +316,19 @@ body{
   font-style:italic;
   letter-spacing:0.3px;
 }
+/* Leaderboard tabs */
+.lb-tabs{
+  display:flex;gap:0;margin-bottom:0;
+}
+.lb-tab{
+  flex:1;padding:.6rem 0;text-align:center;font-size:.75rem;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  border-bottom:2px solid transparent;color:#8b949e;transition:all .2s;
+}
+.lb-tab:hover{color:#c9d1d9}
+.lb-tab.active{color:#e6edf3;border-bottom-color:#58a6ff}
+.lb-section{display:none}
+.lb-section.active{display:block}
 </style>
 </head>
 <body>
@@ -606,25 +619,48 @@ function showDetail(gameName) {
   }
   html += '</div></div>';
 
-  // Top 10 scores
-  html += '<div class="detail-scores">';
-  const scores = (game.scores || []).slice(0, 10);
+  // Build score rows helper
   const theme = getTheme(name);
-  scores.forEach((s, i) => {
-    const allAccess = s.is_all_access ? ' all-access' : '';
-    const color = isJjp ? theme.colors[i % theme.colors.length] : (s.background_color_hex || '#888');
-    const avatarContent = s.avatar_path
-      ? `<img src="${s.avatar_path}" alt="${escapeHtml(s.username)}">`
-      : getInitials(s.username);
+  function buildScoreRows(scoreList) {
+    let rows = '';
+    const sl = (scoreList || []).slice(0, 10);
+    sl.forEach((s, i) => {
+      const allAccess = s.is_all_access ? ' all-access' : '';
+      const color = isJjp ? theme.colors[i % theme.colors.length] : (s.background_color_hex || '#888');
+      const avatarContent = s.avatar_path
+        ? `<img src="${s.avatar_path}" alt="${escapeHtml(s.username)}">`
+        : getInitials(s.username);
+      rows += `<div class="score-row${allAccess}">`;
+      rows += `<span class="rank-num">${i + 1}</span>`;
+      rows += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
+      rows += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
+      rows += `<span class="score-val">${formatScore(s.score)}</span>`;
+      rows += '</div>';
+    });
+    if (sl.length === 0) rows = '<div style="text-align:center;color:#484f58;padding:1.5rem;font-style:italic">No scores yet</div>';
+    return rows;
+  }
 
-    html += `<div class="score-row${allAccess}">`;
-    html += `<span class="rank-num">${i + 1}</span>`;
-    html += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
-    html += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
-    html += `<span class="score-val">${formatScore(s.score)}</span>`;
-    html += '</div>';
-  });
+  const now = new Date();
+  const monthLabel = now.toLocaleString('en-US', { month: 'long' });
+
+  // Tabs
+  html += '<div class="lb-tabs">';
+  html += `<div class="lb-tab active" onclick="switchLbTab(this,'monthly')">📅 ${monthLabel}</div>`;
+  html += '<div class="lb-tab" onclick="switchLbTab(this,\'alltime\')">🏆 All Time</div>';
   html += '</div>';
+
+  // Monthly scores section
+  html += '<div class="lb-section active" id="lb-monthly">';
+  html += '<div class="detail-scores">';
+  html += buildScoreRows(game.scores);
+  html += '</div></div>';
+
+  // All-time scores section
+  html += '<div class="lb-section" id="lb-alltime">';
+  html += '<div class="detail-scores">';
+  html += buildScoreRows(game.alltime_scores || game.scores);
+  html += '</div></div>';
 
   // Last-updated footer
   if (game.updated) {
@@ -648,6 +684,13 @@ function hideDetail() {
   document.getElementById('carousel-container').style.display = '';
   document.getElementById('carousel-dots').style.display = '';
   startCarousel();
+}
+
+function switchLbTab(el, tab) {
+  el.parentNode.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.lb-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('lb-' + tab).classList.add('active');
 }
 
 async function loadDashboard() {
