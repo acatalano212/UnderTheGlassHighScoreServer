@@ -445,6 +445,24 @@ body{
   font-family:'Oswald',sans-serif;
   font-style:italic;
 }
+/* Buy/Rent promo callout */
+.detail-promo{
+  background:rgba(46,204,113,.06);
+  border:1px solid rgba(46,204,113,.18);
+  border-radius:8px;
+  padding:1rem 1.2rem;
+  margin-top:.6rem;
+  text-align:center;
+}
+.detail-promo-title{
+  font-size:1.05rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:#2ecc71;margin-bottom:.4rem;
+  font-family:'Oswald',sans-serif;
+}
+.detail-promo-text{
+  font-size:1.05rem;color:#ccc;line-height:1.55;
+  font-family:'Oswald',sans-serif;
+}
 /* Side-by-side leaderboards */
 .lb-columns{
   display:flex;gap:1.2rem;padding:0.8rem 1rem 0;
@@ -561,6 +579,8 @@ body{
   .detail-about-desc{font-size:1rem}
   .detail-funfact-text{font-size:.95rem}
   .detail-funfact-title{font-size:.95rem}
+  .detail-promo-text{font-size:.95rem}
+  .detail-promo-title{font-size:.95rem}
   /* Banner responsive */
   .banner{padding:.5rem 1rem}
   .brand-logo{max-height:40px !important}
@@ -1306,6 +1326,20 @@ function startCarousel() {
   }, 5000);
 }
 
+// Rotating buy/rent promo taglines
+const PROMO_TAGLINES = [
+  'Love this game? Buy or rent it for your home!',
+  'Want this machine in your game room? We sell and rent pinball machines!',
+  'Take the game home! Under the Glass offers pinball sales and rentals.',
+  "Can't get enough? This game is available for purchase or rental from Under the Glass.",
+  'Your own arcade starts here — ask us about buying or renting this machine!',
+  'Why leave the fun behind? We can put this game in your home.',
+  'Play anytime you want — inquire about purchasing or renting this table.',
+  'Bring the arcade home! Under the Glass has pinball machines for sale and rent.',
+  'Obsessed? Good. We sell and rent every machine on our floor.',
+  'Skip the quarters — own or rent this game and play unlimited at home!',
+];
+
 function showDetail(gameName, isAutoCycle) {
   // Pause carousel (but not during auto detail-cycle)
   if (!isAutoCycle && carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
@@ -1455,6 +1489,12 @@ function showDetail(gameName, isAutoCycle) {
     html += `<div class="detail-funfact-text">${escapeHtml(fact)}</div>`;
     html += '</div>';
   }
+  // Buy/Rent promo
+  const promo = PROMO_TAGLINES[Math.floor(Math.random() * PROMO_TAGLINES.length)];
+  html += '<div class="detail-promo">';
+  html += '<div class="detail-promo-title">🎯 Own or Rent</div>';
+  html += `<div class="detail-promo-text">${escapeHtml(promo)}</div>`;
+  html += '</div>';
   html += '</div>'; // end detail-about
 
   html += '</div>'; // end detail-body
