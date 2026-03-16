@@ -308,6 +308,14 @@ body{
 .detail-scores .score-val{
   font-size:1.05rem;
 }
+.detail-updated{
+  text-align:center;
+  color:#888;
+  font-size:0.75rem;
+  padding:0.5rem 0 0.25rem;
+  font-style:italic;
+  letter-spacing:0.3px;
+}
 </style>
 </head>
 <body>
@@ -616,7 +624,16 @@ function showDetail(gameName) {
     html += `<span class="score-val">${formatScore(s.score)}</span>`;
     html += '</div>';
   });
-  html += '</div></div>';
+  html += '</div>';
+
+  // Last-updated footer
+  if (game.updated) {
+    const d = new Date(game.updated);
+    const ts = d.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true });
+    html += `<div class="detail-updated">Last Updated: ${ts}</div>`;
+  }
+
+  html += '</div>';
 
   // Hide carousel, show detail
   document.getElementById('carousel-container').style.display = 'none';

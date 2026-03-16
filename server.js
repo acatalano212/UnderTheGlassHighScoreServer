@@ -354,6 +354,9 @@ async function loadSternData() {
           square_logo: asset.square_logo || "",
           source: "stern",
           scores: [],
+          updated: sternCache["stern_lb"]
+            ? new Date(sternCache["stern_lb"].ts).toISOString()
+            : new Date().toISOString(),
         };
       }
 
