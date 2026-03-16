@@ -20,6 +20,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+
+// Request logging for API calls
+app.use("/api", (req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const ms = Date.now() - start;
+    console.log(`${req.method} ${req.originalUrl} ${res.statusCode} ${ms}ms [${req.ip}]`);
+  });
+  next();
+});
+
 app.use(express.static(join(__dirname, "public")));
 
 // ---------------------------------------------------------------------------
