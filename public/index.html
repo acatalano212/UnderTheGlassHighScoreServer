@@ -233,34 +233,64 @@ body{
 
 /* --------------------------------------------------------- detail view */
 .detail-view{
-  max-width:1500px;
-  margin:0 auto;
-  padding:1.6rem 2rem 3rem;
+  width:100%;
+  margin:0;
+  padding:1rem 2rem 2rem;
   opacity:1;
   transition:opacity 0.5s ease;
+  box-sizing:border-box;
+  overflow:hidden;
 }
 .detail-view.fading{opacity:0}
 .detail-back{
   display:inline-flex;align-items:center;gap:.4rem;
   color:#8b949e;font-size:.95rem;font-weight:600;
   letter-spacing:.06em;cursor:pointer;
-  margin-bottom:1.2rem;
+  margin-bottom:.8rem;
   transition:color .2s;
 }
 .detail-back:hover{color:#e6edf3}
-.detail-card{
-  background:rgba(255,255,255,.03);
-  border-radius:12px;
+
+/* 3-column detail layout: machine | header+scores | about */
+.detail-body{
+  display:grid;
+  grid-template-columns:30% 1fr 25%;
+  gap:1.5rem;
+  align-items:start;
+  min-height:0;
   overflow:hidden;
-  border:1px solid rgba(255,255,255,.06);
+}
+.detail-machine{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1rem 0;
+}
+.detail-machine img{
+  max-width:100%;
+  max-height:680px;
+  height:auto;
+  display:block;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 24px rgba(0,0,0,.6)) drop-shadow(0 0 60px rgba(255,255,255,.06));
+}
+
+/* CENTER: header + scores stacked */
+.detail-center{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
 }
 .detail-header{
   position:relative;
-  height:140px;
+  height:130px;
   display:flex;
   align-items:center;
   padding:0 1.5rem;
   overflow:hidden;
+  border-radius:10px 10px 0 0;
+  border:1px solid rgba(255,255,255,.06);
+  border-bottom:none;
 }
 .detail-header .bg{
   position:absolute;inset:0;
@@ -298,6 +328,12 @@ body{
   transform:translateY(-50%);
   filter:drop-shadow(0 0 4px rgba(255,255,255,.7)) drop-shadow(0 0 8px rgba(255,255,255,.3));
 }
+.detail-scores-wrap{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:0 0 10px 10px;
+  overflow:hidden;
+}
 .detail-scores .score-row{
   padding:.7rem 1.5rem;
   font-size:1.05rem;
@@ -319,78 +355,78 @@ body{
   font-style:italic;
   letter-spacing:0.3px;
 }
-/* 3-column detail layout */
-.detail-body{
-  display:grid;
-  grid-template-columns:280px 1fr 300px;
-  gap:1.2rem;
-  padding:1rem;
-}
-.detail-playfield{
-  border-radius:8px;
-  overflow:hidden;
-  background:rgba(0,0,0,.3);
-  border:1px solid rgba(255,255,255,.06);
-}
-.detail-playfield img{
-  width:100%;
-  height:auto;
-  display:block;
-  object-fit:cover;
-}
-.detail-center{
-  min-width:0;
-}
+
+/* RIGHT: About the game */
 .detail-about{
   background:rgba(255,255,255,.03);
-  border-radius:8px;
-  padding:1rem 1.2rem;
+  border-radius:10px;
+  padding:1.2rem 1.4rem;
   border:1px solid rgba(255,255,255,.06);
   font-family:'Oswald',sans-serif;
   display:flex;
   flex-direction:column;
-  gap:.8rem;
+  gap:1rem;
+  overflow:hidden;
+  min-width:0;
 }
 .detail-about-title{
-  font-size:1rem;font-weight:700;text-transform:uppercase;
+  font-size:1.15rem;font-weight:700;text-transform:uppercase;
   letter-spacing:.12em;color:#58a6ff;
-  padding-bottom:.4rem;border-bottom:2px solid rgba(255,255,255,.1);
+  padding-bottom:.5rem;border-bottom:2px solid rgba(255,255,255,.1);
 }
 .detail-about-desc{
-  font-size:.85rem;color:#aaa;line-height:1.5;
+  font-size:1rem;color:#bbb;line-height:1.5;
   font-family:'Oswald',sans-serif;
 }
 .detail-about-section{
-  margin-top:.2rem;
+  margin-top:.3rem;
 }
 .detail-about-section-title{
-  font-size:.8rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:.1em;color:#8b949e;margin-bottom:.3rem;
+  font-size:.95rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:#8b949e;margin-bottom:.4rem;
 }
 .detail-about-features{
-  font-size:.8rem;color:#aaa;line-height:1.5;
+  font-size:.95rem;color:#bbb;line-height:1.5;
   font-family:'Oswald',sans-serif;
 }
 .detail-about-year{
-  font-size:.85rem;color:#f0c040;font-weight:700;
+  font-size:1.05rem;color:#f0c040;font-weight:700;
 }
 .detail-credits{
   list-style:none;padding:0;margin:0;
 }
 .detail-credits li{
-  padding:.25rem 0;
-  font-size:.8rem;
+  padding:.3rem 0;
+  font-size:.95rem;
   border-bottom:1px solid rgba(255,255,255,.04);
   display:flex;gap:.5rem;
 }
 .detail-credits li:last-child{border-bottom:none}
 .credit-role{
-  color:#8b949e;font-weight:600;min-width:90px;flex-shrink:0;
-  text-transform:uppercase;font-size:.7rem;letter-spacing:.05em;
-  padding-top:1px;
+  color:#8b949e;font-weight:600;min-width:100px;flex-shrink:0;
+  text-transform:uppercase;font-size:.8rem;letter-spacing:.05em;
+  padding-top:2px;
 }
 .credit-name{
   color:#ccc;
+}
+/* Did You Know callout */
+.detail-funfact{
+  background:rgba(88,166,255,.06);
+  border:1px solid rgba(88,166,255,.15);
+  border-radius:8px;
+  padding:1rem 1.2rem;
+  margin-top:.6rem;
+}
+.detail-funfact-title{
+  font-size:.9rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:#58a6ff;margin-bottom:.4rem;
+  font-family:'Oswald',sans-serif;
+}
+.detail-funfact-text{
+  font-size:.95rem;color:#bbb;line-height:1.5;
+  font-family:'Oswald',sans-serif;
+  font-style:italic;
 }
 /* Side-by-side leaderboards */
 .lb-columns{
@@ -458,87 +494,108 @@ const JJP_ASSETS = {
   'jjp-hp-we': {
     primary_background: 'static/hp-banner.jpg',
     square_logo: 'static/hp-logo.png',
-    playfield: 'static/hp-playfield.webp',
+    machine: 'static/hp-machine.png',
   },
   'jjp-hp-ce': {
     primary_background: 'static/hpce-banner.jpg',
     square_logo: 'static/hp-logo.png',
-    playfield: 'static/hpce-playfield.webp',
+    machine: 'static/hpce-machine.png',
   },
   'jjp-avatar': {
     primary_background: 'static/avatar-banner.webp',
     square_logo: 'static/avatar-logo.png',
-    playfield: 'static/avatar-playfield.webp',
+    machine: 'static/avatar-machine.png',
   },
   'jjp-godfather': {
     primary_background: 'static/godfather-banner.jpg',
     square_logo: 'static/godfather-logo.png',
-    playfield: 'static/godfather-playfield.webp',
+    machine: 'static/godfather-machine.webp',
   },
   'jjp-toystory4': {
     primary_background: 'static/toystory-banner.jpg',
     square_logo: 'static/toystory-logo.webp',
-    playfield: 'static/toystory-playfield.webp',
+    machine: 'static/toystory-machine.webp',
   },
   'jjp-eltonjohn': {
     primary_background: 'static/eltonjohn-banner.jpg',
     square_logo: 'static/eltonjohn-logo.webp',
-    playfield: 'static/eltonjohn-playfield.webp',
+    machine: 'static/eltonjohn-machine.webp',
   },
   'jjp-potc': {
     primary_background: 'static/potc-banner.jpg',
     square_logo: 'static/potc-logo.webp',
-    playfield: 'static/potc-playfield.webp',
+    machine: 'static/potc-machine.webp',
   },
   "jjp-gnr": {
     primary_background: 'static/gnr-banner.jpg',
     square_logo: 'static/gnr-logo.webp',
-    playfield: 'static/gnr-playfield.jpg',
+    machine: 'static/gnr-machine.webp',
   },
   "bof-wmh": {
     primary_background: 'static/wmh-banner.avif',
     square_logo: 'static/wmh-logo.png',
-    playfield: 'static/wmh-playfield.jpg',
+    machine: 'static/wmh-machine.png',
   },
   "spooky-bj": {
     primary_background: 'static/beetlejuice-banner.jpg',
     square_logo: 'static/beetlejuice-logo.png',
-    playfield: 'static/beetlejuice-playfield.jpg',
+    machine: 'static/beetlejuice-machine.png',
   },
   "stern-dnd": {
     primary_background: 'static/dnd-banner.webp',
     square_logo: 'static/dnd-logo.webp',
-    playfield: 'static/dnd-playfield.jpg',
+    machine: 'static/dnd-machine.png',
   },
   "stern-pokemon": {
     primary_background: 'static/pokemon-banner.webp',
     square_logo: 'static/pokemon-logo.webp',
-    playfield: 'static/pokemon-playfield.jpg',
+    machine: 'static/pokemon-machine.png',
   },
   "cgc-mm": {
     primary_background: 'static/medievalmadness-banner.jpg',
     square_logo: 'static/medievalmadness-logo.png',
-    playfield: 'static/medievalmadness-playfield.jpg',
+    machine: 'static/medievalmadness-machine.png',
   },
   "bof-dune": {
     primary_background: 'static/dune-banner.png',
     square_logo: 'static/dune-logo.webp',
-    playfield: 'static/dune-playfield.jpg',
+    machine: 'static/dune-machine.png',
   },
   "stern-metallica": {
     primary_background: 'static/metallica-banner.webp',
     square_logo: 'static/metallica-logo.webp',
-    playfield: 'static/metallica-playfield.jpg',
+    machine: 'static/metallica-machine.png',
   },
   "stern-godzilla": {
     primary_background: 'static/godzilla-banner.webp',
     square_logo: 'static/godzilla-logo.webp',
-    playfield: 'static/godzilla-playfield.jpg',
+    machine: 'static/godzilla-machine.png',
   },
   "stern-jaws": {
     primary_background: 'static/jaws-banner.webp',
     square_logo: 'static/jaws-logo.webp',
-    playfield: 'static/jaws-playfield.jpg',
+    machine: 'static/jaws-machine.png',
+  },
+  "DED": {
+    machine: 'static/deadpool-machine.png',
+  },
+  "FOO": {
+    machine: 'static/foofighters-machine.png',
+  },
+  "SKK": {
+    machine: 'static/kingkong-machine.png',
+  },
+  "RSH": {
+    machine: 'static/rush-machine.png',
+  },
+  "SW2": {
+    machine: 'static/starwars-machine.png',
+  },
+  "STR": {
+    machine: 'static/strangerthings-machine.png',
+  },
+  "VEN": {
+    machine: 'static/venom-machine.png',
   },
 };
 
@@ -557,6 +614,7 @@ const GAME_INFO = {
     year: 2025,
     description: 'Step into a world of spells, secrets, and sorcery. This masterpiece transforms the magical world of Hogwarts into an immersive, action-packed pinball experience covering all eight films.',
     features: '3 flippers, 6 balls, moving Hedwig, flying Snitch, interactive castle, Deathly Hallows insert with 38 LEDs',
+    funFact: 'The game features over 100 voice quotes from the Harry Potter films and took more than 3 years to develop — one of the longest development cycles in JJP history.',
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Lead Programmer', name: 'Joe Katz' },
@@ -570,6 +628,7 @@ const GAME_INFO = {
     year: 2025,
     description: 'The ultimate Collector\'s Edition with exclusive MinaLima artwork, premium foil elements, interactive topper with Dark Mark projector, and hand-numbered signed plaque. Limited production.',
     features: '3 flippers, 6 balls, animated Hedwig, death eater mark projection, Snitch topper, surround sound',
+    funFact: 'The CE artwork was created by MinaLima — the same graphic design studio that crafted every prop, poster, and newspaper seen in all eight Harry Potter films.',
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Lead Programmer', name: 'Joe Katz' },
@@ -583,6 +642,7 @@ const GAME_INFO = {
     year: 2024,
     description: 'Battle for Pandora in this immersive pinball experience inspired by James Cameron\'s Avatar. Connect with Eywa and defend the Na\'vi homeland against the RDA.',
     features: '3 flippers, interactive Ikran, Banshee ramp, Tree of Souls, RGB lighting',
+    funFact: 'The game\'s Ikran creature toy has motorized wings that physically flap during gameplay, making it one of the most complex animated toys ever put on a pinball playfield.',
     credits: [
       { role: 'Designer', name: 'Mark Seiden' },
       { role: 'Software', name: 'Keith Johnson' },
@@ -595,6 +655,7 @@ const GAME_INFO = {
     year: 2023,
     description: 'An offer you can\'t refuse. Experience the Corleone family saga in this cinematic pinball masterpiece featuring iconic scenes from the legendary film trilogy.',
     features: '3 flippers, horse head scoop, Baptism multiball, Connie\'s wedding, desk lamp',
+    funFact: 'Slash from Guns N\' Roses recorded an original guitar solo exclusively for this game\'s soundtrack — he\'s a serious pinball collector with over 100 machines.',
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Software', name: 'Keith P. Johnson' },
@@ -607,6 +668,7 @@ const GAME_INFO = {
     year: 2022,
     description: 'To infinity and beyond! Join Woody, Buzz, and the gang in this family-friendly pinball adventure featuring characters and scenes from Pixar\'s beloved franchise.',
     features: '3 flippers, carnival ramp, Forky toy, Bo Peep, Duke Caboom jump ramp',
+    funFact: 'Designer Pat Lawlor is a Pinball Hall of Famer who also created The Addams Family — the best-selling pinball machine of all time with over 20,000 units produced.',
     credits: [
       { role: 'Designer', name: 'Pat Lawlor' },
       { role: 'Software', name: 'Rick Bartlett' },
@@ -618,6 +680,7 @@ const GAME_INFO = {
     year: 2023,
     description: 'A rocket man-sized celebration of Sir Elton John\'s legendary career. Experience decades of iconic music through an electrifying concert-themed pinball show.',
     features: '3 flippers, piano ramp, concert stage, Bennie and the Jets, Crocodile Rock',
+    funFact: 'Designer Steve Ritchie is a Pinball Hall of Famer nicknamed "The King of Flow" — he also created Black Knight, Firepower, and Spider-Man.',
     credits: [
       { role: 'Designer', name: 'Steve Ritchie' },
       { role: 'Software', name: 'Bill Grupp' },
@@ -630,6 +693,7 @@ const GAME_INFO = {
     year: 2018,
     description: 'Set sail on a high-seas adventure with 22 playable characters. Battle Davy Jones, navigate multiball chaos, and chase the Dead Man\'s Chest in JJP\'s most ambitious layout.',
     features: '3 flippers, spinning disc map, rocking ship, treasure trunk lock, cannon shot',
+    funFact: 'With 22 playable characters, this game has more selectable characters than any other pinball machine ever made.',
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Software', name: 'Keith Johnson' },
@@ -641,6 +705,7 @@ const GAME_INFO = {
     year: 2020,
     description: 'Welcome to the jungle! A concert-like pinball experience celebrating Guns N\' Roses with advanced lighting, pounding audio, and rock \'n\' roll gameplay.',
     features: '3 flippers, concert stage, guitar ramp, crowd surfing, pyrotechnic lighting',
+    funFact: 'The game\'s concert stage lighting uses over 200 individually addressable RGB LEDs to simulate real pyrotechnic effects during multiball.',
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Software', name: 'Keith Johnson' },
@@ -652,6 +717,7 @@ const GAME_INFO = {
     year: 2025,
     description: 'Explore the mysterious Winchester Mystery House — the Gothic mansion in San Jose known for its architectural curiosities and haunted legends. Features a Pepper\'s Ghost display effect.',
     features: '3 full flippers, 1 mini-flipper, revolving hallway turntable, collapsing tower, Ouija board apron, Seance table with crystal ball',
+    funFact: 'The real Winchester Mystery House has 161 rooms, 2,000 doors, and 10,000 windows. Construction ran 24 hours a day, 7 days a week, for 38 straight years.',
     credits: [
       { role: 'Designer', name: 'Karl DeAngelo' },
       { role: 'Software', name: 'Eric Priepke' },
@@ -664,6 +730,7 @@ const GAME_INFO = {
     year: 2025,
     description: 'It\'s showtime! Dive into Tim Burton\'s iconic 1988 film with a pinball-eating Sandworm, Dante\'s Inferno wheel, and the Beetlejuice sculpt that rises from his gravestone to fling balls.',
     features: '2 flippers, motorized Sandworm, Dante\'s Inferno roulette, couch ball lock, magnet ball save, Spooky Speak voice recognition topper',
+    funFact: 'The optional "Spooky Speak" topper uses voice recognition — say "Beetlejuice" three times and the game triggers a special mode, just like the movie.',
     credits: [
       { role: 'Designers', name: 'Spooky Luke & Corwin "Bug" Emery' },
       { role: 'Programmers', name: 'Spooky DJ & Casey Butler' },
@@ -675,6 +742,7 @@ const GAME_INFO = {
     year: 2025,
     description: 'Roll for initiative! Battle the Tyrant\'s Eye in this epic dungeon-crawling pinball adventure inspired by the world\'s greatest roleplaying game.',
     features: '3 flippers, dragon toy, dungeon subway, spell casting, character selection, multiball mayhem',
+    funFact: 'Designer Brian Eddy also created Medieval Madness and Attack from Mars — two of the most beloved and valuable pinball machines ever made.',
     credits: [
       { role: 'Designer', name: 'Brian Eddy' },
       { role: 'Software', name: 'Dwight Sullivan' },
@@ -687,6 +755,7 @@ const GAME_INFO = {
     year: 2026,
     description: 'Gotta catch \'em all! Join Ash on a pinball journey through the Pokémon world with an animatronic Pikachu, Poké Ball mechanics, and Team Rocket battles.',
     features: 'Animatronic Pikachu, Poké Ball launcher, Team Rocket features, Pokémon-themed ramps',
+    funFact: 'The animatronic Pikachu on the playfield physically reacts to your gameplay — its ears perk up, it turns to watch the ball, and it cheers when you score big.',
     credits: [
       { role: 'Designers', name: 'Jack Danger & George Gomez' },
       { role: 'Software', name: 'Tanio Klyce' },
@@ -696,6 +765,7 @@ const GAME_INFO = {
     year: 1997,
     description: 'Widely held as one of the best pinball machines of all time. Battle for the kingdom with exploding castles, motorized drawbridge, and pop-up trolls. Merlin Edition remake by Chicago Gaming.',
     features: '3 flippers, exploding castle, motorized drawbridge, 2 pop-up trolls, RGB lighting (Merlin Edition)',
+    funFact: 'Original 1997 Medieval Madness machines regularly sell for over $20,000. Only 4,016 were ever made — making it one of the most sought-after pins in existence.',
     credits: [
       { role: 'Designer', name: 'Brian Eddy' },
       { role: 'Programmer', name: 'Lyman F. Sheats Jr.' },
@@ -707,6 +777,7 @@ const GAME_INFO = {
     year: 2025,
     description: 'Harness desert power on Arrakis. Featuring a ball-eating Sandworm with magnetic capture, interactive Harkonnen Harvester, and Hans Zimmer\'s iconic score.',
     features: '3 flippers, 6 balls, 4 magnets, ball-eating Sandworm, Harkonnen Harvester jump ramp, Thumper Bumper, Bene Gesserit Pain Box, 14.9" backboard display',
+    funFact: 'The Sandworm toy uses magnetic technology to physically capture and swallow the pinball — then spits it back out from a different location on the playfield.',
     credits: [
       { role: 'Designers', name: 'David Van Es & Travis Moseman' },
       { role: 'Software', name: 'Phil Grimaldi & Bowen Kerins' },
@@ -719,6 +790,7 @@ const GAME_INFO = {
     year: 2013,
     description: 'Heavy metal pinball at its finest. Ride the Lightning, Enter Sandman, and battle through Metallica\'s greatest hits in this hard-rocking, fast-playing machine.',
     features: '3 flippers, electric chair, snake, Sparky, coffin lock, guitar pick spinner',
+    funFact: 'The 2024 Remastered edition added 8 new songs, a full-color LCD, and new game modes — including tracks from Grammy-winning album 72 Seasons.',
     credits: [
       { role: 'Designer', name: 'John Borg' },
       { role: 'Programmer', name: 'Lyman Sheats' },
@@ -729,6 +801,7 @@ const GAME_INFO = {
     year: 2021,
     description: 'The King of Monsters stomps onto the playfield! Battle through Godzilla\'s most iconic movie moments with deep rules, innovative mechs, and massive multiball action.',
     features: '3 flippers, Godzilla mech, building destruction, Mechagodzilla, bridge ramp',
+    funFact: 'This was the first Stern pinball to debut the Insider Connected online platform, which now connects over 100,000 pinball players worldwide.',
     credits: [
       { role: 'Designer', name: 'Keith Elwin' },
       { role: 'Software', name: 'Rick Naegele' },
@@ -740,12 +813,91 @@ const GAME_INFO = {
     year: 2024,
     description: 'You\'re gonna need a bigger boat. Hunt the great white shark in this thrilling pinball tribute to Steven Spielberg\'s classic, featuring original film footage and Richard Dreyfuss callouts.',
     features: '3 flippers, shark mech, Orca boat, barrel targets, beach panic',
+    funFact: 'Designer Keith Elwin was the #1 ranked competitive pinball player in the world before becoming one of pinball\'s most acclaimed game designers.',
     credits: [
       { role: 'Designer', name: 'Keith Elwin' },
       { role: 'Software', name: 'Rick Naegele & Elizabeth Gieske' },
       { role: 'Artwork', name: 'Michael Barnard' },
       { role: 'Sound', name: 'Jerry Thompson' },
       { role: 'Voice', name: 'Richard Dreyfuss' },
+    ],
+  },
+  'DED': {
+    year: 2018,
+    description: 'The Merc with a Mouth brings his outrageously funny offbeat humor to pinball. Team up with Wolverine, Domino, and Colossus to battle Juggernaut, Sabretooth, and Mr. Sinister.',
+    features: '3 flippers, Lil\' Deadpool bash toy, drop target bank, dual ramps, Katana Sword ramp return, time machine quests',
+    funFact: 'Voice actor Nolan North recorded over 500 custom voice lines for this game — including Deadpool breaking the fourth wall to comment on your pinball skills.',
+    credits: [
+      { role: 'Designer', name: 'George Gomez' },
+      { role: 'Software', name: 'Tanio Klyce' },
+      { role: 'Artwork', name: 'Jeremy Packer (Zombie Yeti)' },
+      { role: 'Voice', name: 'Nolan North' },
+    ],
+  },
+  'FOO': {
+    year: 2023,
+    description: 'The Foo Fighters concert experience in pinball form. Featuring 15 iconic songs, hand-drawn art, and creative input from every band member including the late Taylor Hawkins.',
+    features: '3 flippers, concert stage, guitar pick spinner, crowd surf ramp, drum kit toy',
+    funFact: 'Dave Grohl and the band provided creative input throughout the 2+ year development. The game is also a tribute to drummer Taylor Hawkins, who passed during production.',
+    credits: [
+      { role: 'Designer', name: 'Jack Danger' },
+      { role: 'Software', name: 'Tim Sexton' },
+      { role: 'Artwork', name: 'Jeremy Packer (Zombie Yeti)' },
+    ],
+  },
+  'SKK': {
+    year: 2025,
+    description: 'Journey to the mysterious Terror Island with Ann Darrow and Jack Driscoll. Features an animatronic King Kong with swinging arms, a giant spider, and a New York City train car that Kong flips over.',
+    features: '3 flippers, animatronic Kong, magnetic spider trap, NYC train car, gong bash target, spiral ramp',
+    funFact: 'King Kong first appeared in 1932 and has influenced every medium of entertainment. This is his first-ever officially licensed pinball machine.',
+    credits: [
+      { role: 'Designer', name: 'Keith Elwin' },
+      { role: 'Software', name: 'Rick Naegele' },
+      { role: 'Artwork', name: 'Michael Barnard' },
+    ],
+  },
+  'RSH': {
+    year: 2022,
+    description: 'Travel through time with Rush in this epic concert-under-glass featuring 16 iconic songs. Custom speech from Alex Lifeson, Geddy Lee, and Ed Robertson of Barenaked Ladies.',
+    features: '3 flippers, electromagnetic Time Machine, Starman bash target, concert lighting, 16 songs',
+    funFact: 'Neil Peart\'s drum solo "Der Trommler" plays during one of the game\'s wizard modes — it was one of the last recordings he made before his passing in 2020.',
+    credits: [
+      { role: 'Designer', name: 'John Borg' },
+      { role: 'Software', name: 'Dwight Sullivan' },
+      { role: 'Artwork', name: 'Jerry Vanderstelt' },
+      { role: 'Voice', name: 'Alex Lifeson & Geddy Lee' },
+    ],
+  },
+  'SW2': {
+    year: 2025,
+    description: 'Save the galaxy in this epic pinball journey through the original Star Wars trilogy. Take down AT-ATs, destroy the Death Star II, escape Cloud City, and defeat the Empire.',
+    features: '3 flippers, AT-AT crash ramp, Death Star multiball, Sarlacc Pit, hyperspace jump ramp, TIE fighter targets',
+    funFact: 'The game includes over 1,000 high-quality film and audio assets from the original trilogy — one of the largest media libraries ever integrated into a pinball machine.',
+    credits: [
+      { role: 'Designer', name: 'Steve Ritchie' },
+      { role: 'Software', name: 'Tim Sexton' },
+    ],
+  },
+  'STR': {
+    year: 2019,
+    description: 'Experience the terrifying forces in Hawkins, Indiana. Search for Eleven, battle the Demogorgon, and uncover the secrets of the Upside Down in this supernatural pinball adventure.',
+    features: '3 flippers, Demogorgon bash toy, rotating targets, video projector on playfield (Premium), telekinetic magnetic ball lock',
+    funFact: 'The Premium edition was the first pinball machine ever to feature a video projector that displays animations directly onto the playfield during gameplay.',
+    credits: [
+      { role: 'Designer', name: 'John Borg' },
+      { role: 'Software', name: 'Lonnie Ropp' },
+      { role: 'Artwork', name: 'Randy Martinez' },
+    ],
+  },
+  'VEN': {
+    year: 2023,
+    description: 'Wreak havoc as Venom in this symbiote-powered pinball adventure. Battle Carnage, fight through an army of symbiotes, and prevent Knull, God of the Symbiotes, from taking over the world.',
+    features: '3 flippers, Venom bash toy, symbiote targets, Carnage battle, magnetic ball catch',
+    funFact: 'The game features over 20 Marvel characters including Venomized versions of Hulk, Wolverine, and Captain America — more Marvel characters than any other Stern pinball.',
+    credits: [
+      { role: 'Designer', name: 'Jack Danger' },
+      { role: 'Software', name: 'Tim Sexton' },
+      { role: 'Artwork', name: 'Jeremy Packer (Zombie Yeti)' },
     ],
   },
 };
@@ -769,6 +921,13 @@ const GAME_THEMES = {
   'spooky-bj':       { colors: ['#ff69b4','#9b5de5','#00f5d4','#f15bb5','#fee440','#00bbf9','#7209b7'] },
   'cgc-mm':          { colors: ['#1d3557','#e63946','#a8dadc','#457b9d','#e9c46a','#264653','#f1faee'] },
   'bof-dune':        { colors: ['#e09f3e','#9e2a2b','#335c67','#540b0e','#fff3b0','#cb997e','#6b705c'] },
+  'DED':             { colors: ['#e63946','#1d1d1d','#f4a261','#e76f51','#a8201a','#6c757d','#d62828'] },
+  'FOO':             { colors: ['#e63946','#264653','#2a9d8f','#e9c46a','#f4a261','#1d3557','#457b9d'] },
+  'SKK':             { colors: ['#6b4226','#8b6914','#c9a857','#3a5a40','#588157','#344e41','#a3b18a'] },
+  'RSH':             { colors: ['#c41e3a','#1a1a2e','#e94560','#0f3460','#16213e','#533483','#e94560'] },
+  'SW2':             { colors: ['#ffd700','#1a1a2e','#e94560','#0f3460','#c41e3a','#16213e','#4a4e69'] },
+  'STR':             { colors: ['#e63946','#1d3557','#f77f00','#d62828','#003049','#457b9d','#fcbf49'] },
+  'VEN':             { colors: ['#1a1a2e','#16213e','#0f3460','#e94560','#533483','#4a4e69','#2b2d42'] },
 };
 const DEFAULT_THEME = { colors: ['#888','#aaa','#666','#999','#777','#bbb','#555'] };
 function getTheme(gameKey) { return GAME_THEMES[gameKey] || DEFAULT_THEME; }
@@ -905,13 +1064,25 @@ function showDetail(gameName, isAutoCycle) {
   const assets = JJP_ASSETS[gameKey] || {};
   const bg = assets.primary_background || game.primary_background || '';
   const logo = assets.square_logo || game.square_logo || '';
-  const playfieldImg = assets.playfield || '';
+  const machineImg = assets.machine || '';
   const displayName = game.display_name || name;
   const subtitle = buildSubtitle(game);
   const info = GAME_INFO[gameKey] || {};
 
   let html = isAutoCycle ? '' : '<div class="detail-back" onclick="hideDetail()">← Back to Leaderboard</div>';
-  html += '<div class="detail-card">';
+
+  // 3-column body: machine image | header+scores | about
+  html += '<div class="detail-body">';
+
+  // LEFT: Machine image floating in space
+  html += '<div class="detail-machine">';
+  if (machineImg) {
+    html += `<img src="${machineImg}" alt="${escapeHtml(displayName)}" loading="lazy">`;
+  }
+  html += '</div>';
+
+  // CENTER: Header + Leaderboards stacked
+  html += '<div class="detail-center">';
 
   // Header
   html += '<div class="detail-header">';
@@ -931,18 +1102,8 @@ function showDetail(gameName, isAutoCycle) {
   }
   html += '</div></div>';
 
-  // 3-column body
-  html += '<div class="detail-body">';
-
-  // LEFT: Playfield image
-  html += '<div class="detail-playfield">';
-  if (playfieldImg) {
-    html += `<img src="${playfieldImg}" alt="${escapeHtml(displayName)} playfield" loading="lazy">`;
-  }
-  html += '</div>';
-
-  // CENTER: Leaderboards
-  html += '<div class="detail-center">';
+  // Scores wrap
+  html += '<div class="detail-scores-wrap">';
 
   // Build score rows helper
   const theme = getTheme(name);
@@ -979,14 +1140,14 @@ function showDetail(gameName, isAutoCycle) {
 
   // All Time column
   html += '<div class="lb-column">';
-  html += '<div class="lb-column-title alltime">🏆 All Time</div>';
+  html += '<div class="lb-column-title alltime">All Time</div>';
   html += '<div class="detail-scores">';
   html += buildScoreRows(game.alltime_scores || game.scores, 11);
   html += '</div></div>';
 
   // Current Month column
   html += '<div class="lb-column">';
-  html += `<div class="lb-column-title monthly">📅 ${monthLabel}</div>`;
+  html += `<div class="lb-column-title monthly">${monthLabel}</div>`;
   html += '<div class="detail-scores">';
   html += buildScoreRows(game.scores, 11);
   html += '</div></div>';
@@ -1000,26 +1161,27 @@ function showDetail(gameName, isAutoCycle) {
     html += `<div class="detail-updated">Last Updated: ${ts}</div>`;
   }
 
+  html += '</div>'; // end detail-scores-wrap
   html += '</div>'; // end detail-center
 
   // RIGHT: About the game
   html += '<div class="detail-about">';
   html += '<div class="detail-about-title">About the Game</div>';
   if (info.year) {
-    html += `<div class="detail-about-year">⚡ ${info.year} · ${escapeHtml(game.manufacturer || '')}</div>`;
+    html += `<div class="detail-about-year">${info.year} · ${escapeHtml(game.manufacturer || '')}</div>`;
   }
   if (info.description) {
     html += `<div class="detail-about-desc">${escapeHtml(info.description)}</div>`;
   }
   if (info.features) {
     html += '<div class="detail-about-section">';
-    html += '<div class="detail-about-section-title">🎯 Features</div>';
+    html += '<div class="detail-about-section-title">Features</div>';
     html += `<div class="detail-about-features">${escapeHtml(info.features)}</div>`;
     html += '</div>';
   }
   if (info.credits && info.credits.length > 0) {
     html += '<div class="detail-about-section">';
-    html += '<div class="detail-about-section-title">🎬 Credits</div>';
+    html += '<div class="detail-about-section-title">Credits</div>';
     html += '<ul class="detail-credits">';
     info.credits.forEach(c => {
       html += `<li><span class="credit-role">${escapeHtml(c.role)}</span><span class="credit-name">${escapeHtml(c.name)}</span></li>`;
@@ -1027,10 +1189,15 @@ function showDetail(gameName, isAutoCycle) {
     html += '</ul>';
     html += '</div>';
   }
+  if (info.funFact) {
+    html += '<div class="detail-funfact">';
+    html += '<div class="detail-funfact-title">Did You Know?</div>';
+    html += `<div class="detail-funfact-text">${escapeHtml(info.funFact)}</div>`;
+    html += '</div>';
+  }
   html += '</div>'; // end detail-about
 
   html += '</div>'; // end detail-body
-  html += '</div>'; // end detail-card
 
   // Hide carousel, show detail
   document.getElementById('carousel-container').style.display = 'none';
@@ -1103,7 +1270,13 @@ async function loadDashboard() {
       document.getElementById('carousel-container').style.display = 'none';
       document.getElementById('carousel-dots').style.display = 'none';
       if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
-      startDetailCycle();
+      // Only start cycle if not already running — preserve position across refreshes
+      if (!detailCycleTimer) {
+        startDetailCycle();
+      } else {
+        // Refresh current game with updated data without resetting position
+        showDetail(sortedGameKeys[detailCycleIndex % sortedGameKeys.length], true);
+      }
     } else {
       // Carousel mode (monthly or alltime)
       stopDetailCycle();
