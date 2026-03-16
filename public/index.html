@@ -613,6 +613,37 @@ body{
   .banner-center .location{font-size:.8rem}
   .banner-center .lb-title{font-size:1.1rem}
 }
+
+/* ---------- 4K / Ultra HD scaling (3840×2160+) ---------- */
+@media(min-width:2200px){
+  html{font-size:24px}
+  .grid,.carousel-container{max-width:3600px}
+  .game-card{height:580px}
+  .card-header{height:165px}
+  .card-header .game-logo{width:108px;height:108px;border-radius:12px}
+  .card-header .mfg-logo{height:108px}
+  .banner-brand{flex:0 0 225px}
+  .banner-brand .brand-logo{height:112px}
+  .banner-right{flex:0 0 225px}
+  .detail-view{padding-top:20px;max-height:calc(100vh - 90px);overflow:hidden}
+  .detail-body{height:calc(100vh - 120px);align-items:stretch}
+  .detail-center{max-height:calc(100vh - 120px)}
+  .detail-about{max-height:calc(100vh - 100px);justify-content:space-evenly;height:100%}
+  .detail-scores-wrap{flex:1;display:flex;flex-direction:column;border-radius:0 0 14px 14px}
+  .detail-scores-wrap .lb-columns{flex:1;display:flex}
+  .detail-scores-wrap .lb-column{display:flex;flex-direction:column}
+  .detail-scores-wrap .detail-scores{flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
+  .detail-header{height:390px;border-radius:14px 14px 0 0}
+  .detail-header .game-logo{width:165px;height:165px;border-radius:14px}
+  .detail-header .mfg-logo{height:150px}
+  .detail-scores .avatar{width:56px;height:56px;font-size:1.1rem}
+  .detail-scores .rank-num{width:48px}
+  .avatar{width:50px;height:50px}
+  .rank-num{width:42px}
+  .credit-role{min-width:150px}
+  .detail-promo-title img{height:60px}
+  .detail-jspl-promo-title img{height:75px}
+}
 </style>
 </head>
 <body>
