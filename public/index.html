@@ -468,6 +468,102 @@ body{
   font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;
   color:#f0c040;opacity:.7;
 }
+
+/* ---------- Mobile tab toggle (hidden on desktop) ---------- */
+.lb-tabs{display:none}
+
+/* ---------- Mobile detail responsive ---------- */
+@media(max-width:900px){
+  .detail-view{
+    padding:20px 1rem 0;
+    max-height:none;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .detail-body{
+    grid-template-columns:1fr !important;
+    height:auto;
+    overflow:visible;
+    gap:.8rem;
+  }
+  .detail-machine{display:none !important}
+  .detail-center{
+    max-height:none;
+    overflow:visible;
+    order:1;
+  }
+  .detail-about{
+    max-height:none;
+    overflow:visible;
+    order:2;
+  }
+  .detail-header{
+    height:140px;
+    padding:0 1rem;
+  }
+  .detail-header .game-logo{
+    width:60px;height:60px;
+  }
+  .detail-header .title-text{
+    font-size:1.4rem;
+  }
+  .detail-header .subtitle-text{
+    font-size:.85rem;
+  }
+  .detail-header .mfg-logo{
+    height:50px;right:1rem;
+  }
+  /* Tab toggle visible on mobile */
+  .lb-tabs{
+    display:flex;
+    gap:0;
+    border-bottom:2px solid rgba(255,255,255,.1);
+    margin:0 1rem;
+  }
+  .lb-tab{
+    flex:1;
+    text-align:center;
+    padding:.7rem 0;
+    font-size:1rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    cursor:pointer;
+    color:#8b949e;
+    border-bottom:3px solid transparent;
+    margin-bottom:-2px;
+    transition:color .2s, border-color .2s;
+    font-family:'Oswald',sans-serif;
+  }
+  .lb-tab.active-alltime{color:#f0c040;border-bottom-color:#f0c040}
+  .lb-tab.active-monthly{color:#58a6ff;border-bottom-color:#58a6ff}
+  /* Hide column titles on mobile since tabs replace them */
+  .lb-columns{
+    flex-direction:column;
+    padding:0.5rem .5rem 0;
+    gap:0;
+  }
+  .lb-column{display:none}
+  .lb-column.lb-col-active{display:block}
+  .lb-column-title{display:none}
+  /* Scores sizing for mobile */
+  .detail-scores .score-row{
+    padding:.5rem .8rem;
+    font-size:.95rem;
+  }
+  .detail-scores .avatar{
+    width:32px;height:32px;font-size:.8rem;
+  }
+  .detail-about-title{font-size:1.2rem}
+  .detail-about-desc{font-size:1rem}
+  .detail-funfact-text{font-size:.95rem}
+  .detail-funfact-title{font-size:.95rem}
+  /* Banner responsive */
+  .banner{padding:.5rem 1rem}
+  .brand-logo{max-height:40px !important}
+  .banner-center .location{font-size:.8rem}
+  .banner-center .lb-title{font-size:1.1rem}
+}
 </style>
 </head>
 <body>
@@ -1291,18 +1387,22 @@ function showDetail(gameName, isAutoCycle) {
   const now = new Date();
   const monthLabel = now.toLocaleString('en-US', { month: 'long' });
 
-  // Side-by-side leaderboards
+  // Side-by-side leaderboards (tabs for mobile)
+  html += '<div class="lb-tabs">';
+  html += '<div class="lb-tab active-alltime" data-col="alltime" onclick="switchLbTab(this)">All Time</div>';
+  html += `<div class="lb-tab" data-col="monthly" onclick="switchLbTab(this)">${monthLabel}</div>`;
+  html += '</div>';
   html += '<div class="lb-columns">';
 
   // All Time column
-  html += '<div class="lb-column">';
+  html += '<div class="lb-column lb-col-active" id="lb-col-alltime">';
   html += '<div class="lb-column-title alltime">All Time</div>';
   html += '<div class="detail-scores">';
   html += buildScoreRows(game.alltime_scores || game.scores, 11);
   html += '</div></div>';
 
   // Current Month column
-  html += '<div class="lb-column">';
+  html += '<div class="lb-column" id="lb-col-monthly">';
   html += `<div class="lb-column-title monthly">${monthLabel}</div>`;
   html += '<div class="detail-scores">';
   html += buildScoreRows(game.scores, 11, false);
@@ -1362,6 +1462,48 @@ function showDetail(gameName, isAutoCycle) {
   const detailView = document.getElementById('detail-view');
   detailView.innerHTML = html;
   detailView.style.display = 'block';
+
+  // Mobile swipe navigation between games
+  if (!isAutoCycle) {
+    let touchStartX = 0;
+    let touchStartY = 0;
+    detailView.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+    detailView.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      const dy = e.changedTouches[0].screenY - touchStartY;
+      if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx)) return;
+      const idx = sortedGameKeys.indexOf(name);
+      if (idx === -1) return;
+      let nextIdx;
+      if (dx < 0) { // swipe left = next
+        nextIdx = (idx + 1) % sortedGameKeys.length;
+      } else { // swipe right = prev
+        nextIdx = (idx - 1 + sortedGameKeys.length) % sortedGameKeys.length;
+      }
+      detailView.classList.add('fading');
+      setTimeout(() => {
+        showDetail(sortedGameKeys[nextIdx], false);
+        detailView.classList.remove('fading');
+      }, 300);
+    }, { passive: true });
+  }
+}
+
+// Mobile leaderboard tab toggle
+function switchLbTab(el) {
+  const col = el.dataset.col;
+  // Update tab active states
+  document.querySelectorAll('.lb-tab').forEach(t => {
+    t.className = 'lb-tab';
+  });
+  el.classList.add(col === 'alltime' ? 'active-alltime' : 'active-monthly');
+  // Toggle column visibility
+  document.querySelectorAll('.lb-column').forEach(c => c.classList.remove('lb-col-active'));
+  const target = document.getElementById('lb-col-' + col);
+  if (target) target.classList.add('lb-col-active');
 }
 
 function hideDetail() {
