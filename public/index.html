@@ -233,7 +233,7 @@ body{
 
 /* --------------------------------------------------------- detail view */
 .detail-view{
-  max-width:1100px;
+  max-width:1500px;
   margin:0 auto;
   padding:1.6rem 2rem 3rem;
   opacity:1;
@@ -319,6 +319,79 @@ body{
   font-style:italic;
   letter-spacing:0.3px;
 }
+/* 3-column detail layout */
+.detail-body{
+  display:grid;
+  grid-template-columns:280px 1fr 300px;
+  gap:1.2rem;
+  padding:1rem;
+}
+.detail-playfield{
+  border-radius:8px;
+  overflow:hidden;
+  background:rgba(0,0,0,.3);
+  border:1px solid rgba(255,255,255,.06);
+}
+.detail-playfield img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:cover;
+}
+.detail-center{
+  min-width:0;
+}
+.detail-about{
+  background:rgba(255,255,255,.03);
+  border-radius:8px;
+  padding:1rem 1.2rem;
+  border:1px solid rgba(255,255,255,.06);
+  font-family:'Oswald',sans-serif;
+  display:flex;
+  flex-direction:column;
+  gap:.8rem;
+}
+.detail-about-title{
+  font-size:1rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.12em;color:#58a6ff;
+  padding-bottom:.4rem;border-bottom:2px solid rgba(255,255,255,.1);
+}
+.detail-about-desc{
+  font-size:.85rem;color:#aaa;line-height:1.5;
+  font-family:'Oswald',sans-serif;
+}
+.detail-about-section{
+  margin-top:.2rem;
+}
+.detail-about-section-title{
+  font-size:.8rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:#8b949e;margin-bottom:.3rem;
+}
+.detail-about-features{
+  font-size:.8rem;color:#aaa;line-height:1.5;
+  font-family:'Oswald',sans-serif;
+}
+.detail-about-year{
+  font-size:.85rem;color:#f0c040;font-weight:700;
+}
+.detail-credits{
+  list-style:none;padding:0;margin:0;
+}
+.detail-credits li{
+  padding:.25rem 0;
+  font-size:.8rem;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  display:flex;gap:.5rem;
+}
+.detail-credits li:last-child{border-bottom:none}
+.credit-role{
+  color:#8b949e;font-weight:600;min-width:90px;flex-shrink:0;
+  text-transform:uppercase;font-size:.7rem;letter-spacing:.05em;
+  padding-top:1px;
+}
+.credit-name{
+  color:#ccc;
+}
 /* Side-by-side leaderboards */
 .lb-columns{
   display:flex;gap:1.2rem;padding:0.8rem 1rem 0;
@@ -385,70 +458,87 @@ const JJP_ASSETS = {
   'jjp-hp-we': {
     primary_background: 'static/hp-banner.jpg',
     square_logo: 'static/hp-logo.png',
+    playfield: 'static/hp-playfield.webp',
   },
   'jjp-hp-ce': {
     primary_background: 'static/hpce-banner.jpg',
     square_logo: 'static/hp-logo.png',
+    playfield: 'static/hpce-playfield.webp',
   },
   'jjp-avatar': {
     primary_background: 'static/avatar-banner.webp',
     square_logo: 'static/avatar-logo.png',
+    playfield: 'static/avatar-playfield.webp',
   },
   'jjp-godfather': {
     primary_background: 'static/godfather-banner.jpg',
     square_logo: 'static/godfather-logo.png',
+    playfield: 'static/godfather-playfield.webp',
   },
   'jjp-toystory4': {
     primary_background: 'static/toystory-banner.jpg',
     square_logo: 'static/toystory-logo.webp',
+    playfield: 'static/toystory-playfield.webp',
   },
   'jjp-eltonjohn': {
     primary_background: 'static/eltonjohn-banner.jpg',
     square_logo: 'static/eltonjohn-logo.webp',
+    playfield: 'static/eltonjohn-playfield.webp',
   },
   'jjp-potc': {
     primary_background: 'static/potc-banner.jpg',
     square_logo: 'static/potc-logo.webp',
+    playfield: 'static/potc-playfield.webp',
   },
   "jjp-gnr": {
     primary_background: 'static/gnr-banner.jpg',
     square_logo: 'static/gnr-logo.webp',
+    playfield: 'static/gnr-playfield.jpg',
   },
   "bof-wmh": {
     primary_background: 'static/wmh-banner.avif',
     square_logo: 'static/wmh-logo.png',
+    playfield: 'static/wmh-playfield.jpg',
   },
   "spooky-bj": {
     primary_background: 'static/beetlejuice-banner.jpg',
     square_logo: 'static/beetlejuice-logo.png',
+    playfield: 'static/beetlejuice-playfield.jpg',
   },
   "stern-dnd": {
     primary_background: 'static/dnd-banner.webp',
     square_logo: 'static/dnd-logo.webp',
+    playfield: 'static/dnd-playfield.jpg',
   },
   "stern-pokemon": {
     primary_background: 'static/pokemon-banner.webp',
     square_logo: 'static/pokemon-logo.webp',
+    playfield: 'static/pokemon-playfield.jpg',
   },
   "cgc-mm": {
     primary_background: 'static/medievalmadness-banner.jpg',
     square_logo: 'static/medievalmadness-logo.png',
+    playfield: 'static/medievalmadness-playfield.jpg',
   },
   "bof-dune": {
     primary_background: 'static/dune-banner.png',
     square_logo: 'static/dune-logo.webp',
+    playfield: 'static/dune-playfield.jpg',
   },
   "stern-metallica": {
     primary_background: 'static/metallica-banner.webp',
     square_logo: 'static/metallica-logo.webp',
+    playfield: 'static/metallica-playfield.jpg',
   },
   "stern-godzilla": {
     primary_background: 'static/godzilla-banner.webp',
     square_logo: 'static/godzilla-logo.webp',
+    playfield: 'static/godzilla-playfield.jpg',
   },
   "stern-jaws": {
     primary_background: 'static/jaws-banner.webp',
     square_logo: 'static/jaws-logo.webp',
+    playfield: 'static/jaws-playfield.jpg',
   },
 };
 
@@ -459,6 +549,205 @@ const MFG_LOGOS = {
   'Spooky Pinball': 'static/spooky-mfg-logo.png',
   'Chicago Gaming': 'static/cgc-mfg-logo.png',
   'Barrels of Fun': 'static/bof-mfg-logo.png',
+};
+
+// Game info — descriptions, credits, and details for the detail page
+const GAME_INFO = {
+  'jjp-hp-we': {
+    year: 2025,
+    description: 'Step into a world of spells, secrets, and sorcery. This masterpiece transforms the magical world of Hogwarts into an immersive, action-packed pinball experience covering all eight films.',
+    features: '3 flippers, 6 balls, moving Hedwig, flying Snitch, interactive castle, Deathly Hallows insert with 38 LEDs',
+    credits: [
+      { role: 'Designer', name: 'Eric Meunier' },
+      { role: 'Lead Programmer', name: 'Joe Katz' },
+      { role: 'Art Direction', name: 'Jean-Paul deWin' },
+      { role: 'Artist', name: 'Jesper Abels' },
+      { role: 'Sound', name: 'David Thiel' },
+      { role: 'Sculpts', name: 'Lars Scholten' },
+    ],
+  },
+  'jjp-hp-ce': {
+    year: 2025,
+    description: 'The ultimate Collector\'s Edition with exclusive MinaLima artwork, premium foil elements, interactive topper with Dark Mark projector, and hand-numbered signed plaque. Limited production.',
+    features: '3 flippers, 6 balls, animated Hedwig, death eater mark projection, Snitch topper, surround sound',
+    credits: [
+      { role: 'Designer', name: 'Eric Meunier' },
+      { role: 'Lead Programmer', name: 'Joe Katz' },
+      { role: 'CE Art', name: 'MinaLima' },
+      { role: 'Art Direction', name: 'Jean-Paul deWin' },
+      { role: 'Sound', name: 'David Thiel' },
+      { role: 'Sculpts', name: 'Lars Scholten' },
+    ],
+  },
+  'jjp-avatar': {
+    year: 2024,
+    description: 'Battle for Pandora in this immersive pinball experience inspired by James Cameron\'s Avatar. Connect with Eywa and defend the Na\'vi homeland against the RDA.',
+    features: '3 flippers, interactive Ikran, Banshee ramp, Tree of Souls, RGB lighting',
+    credits: [
+      { role: 'Designer', name: 'Mark Seiden' },
+      { role: 'Software', name: 'Keith Johnson' },
+      { role: 'Artwork', name: 'Lea Faske' },
+      { role: 'Music', name: 'Stemage' },
+      { role: 'Sculpts', name: 'Todd Hone' },
+    ],
+  },
+  'jjp-godfather': {
+    year: 2023,
+    description: 'An offer you can\'t refuse. Experience the Corleone family saga in this cinematic pinball masterpiece featuring iconic scenes from the legendary film trilogy.',
+    features: '3 flippers, horse head scoop, Baptism multiball, Connie\'s wedding, desk lamp',
+    credits: [
+      { role: 'Designer', name: 'Eric Meunier' },
+      { role: 'Software', name: 'Keith P. Johnson' },
+      { role: 'Artwork', name: 'Christopher Franchi' },
+      { role: 'Art Direction', name: 'Jean-Paul deWin' },
+      { role: 'Guitar', name: 'Slash' },
+    ],
+  },
+  'jjp-toystory4': {
+    year: 2022,
+    description: 'To infinity and beyond! Join Woody, Buzz, and the gang in this family-friendly pinball adventure featuring characters and scenes from Pixar\'s beloved franchise.',
+    features: '3 flippers, carnival ramp, Forky toy, Bo Peep, Duke Caboom jump ramp',
+    credits: [
+      { role: 'Designer', name: 'Pat Lawlor' },
+      { role: 'Software', name: 'Rick Bartlett' },
+      { role: 'Artwork', name: 'John Youssi' },
+      { role: 'Animation', name: 'Jean-Paul deWin' },
+    ],
+  },
+  'jjp-eltonjohn': {
+    year: 2023,
+    description: 'A rocket man-sized celebration of Sir Elton John\'s legendary career. Experience decades of iconic music through an electrifying concert-themed pinball show.',
+    features: '3 flippers, piano ramp, concert stage, Bennie and the Jets, Crocodile Rock',
+    credits: [
+      { role: 'Designer', name: 'Steve Ritchie' },
+      { role: 'Software', name: 'Bill Grupp' },
+      { role: 'Artwork', name: 'Christopher Franchi' },
+      { role: 'Art Direction', name: 'John Youssi' },
+      { role: 'Voice', name: 'Elton John' },
+    ],
+  },
+  'jjp-potc': {
+    year: 2018,
+    description: 'Set sail on a high-seas adventure with 22 playable characters. Battle Davy Jones, navigate multiball chaos, and chase the Dead Man\'s Chest in JJP\'s most ambitious layout.',
+    features: '3 flippers, spinning disc map, rocking ship, treasure trunk lock, cannon shot',
+    credits: [
+      { role: 'Designer', name: 'Eric Meunier' },
+      { role: 'Software', name: 'Keith Johnson' },
+      { role: 'Art Direction', name: 'Jean-Paul deWin' },
+      { role: 'Artwork', name: 'Markus Rothkranz' },
+    ],
+  },
+  'jjp-gnr': {
+    year: 2020,
+    description: 'Welcome to the jungle! A concert-like pinball experience celebrating Guns N\' Roses with advanced lighting, pounding audio, and rock \'n\' roll gameplay.',
+    features: '3 flippers, concert stage, guitar ramp, crowd surfing, pyrotechnic lighting',
+    credits: [
+      { role: 'Designer', name: 'Eric Meunier' },
+      { role: 'Software', name: 'Keith Johnson' },
+      { role: 'Artwork', name: 'Roman Garcia' },
+      { role: 'Art Direction', name: 'Jean-Paul deWin' },
+    ],
+  },
+  'bof-wmh': {
+    year: 2025,
+    description: 'Explore the mysterious Winchester Mystery House — the Gothic mansion in San Jose known for its architectural curiosities and haunted legends. Features a Pepper\'s Ghost display effect.',
+    features: '3 full flippers, 1 mini-flipper, revolving hallway turntable, collapsing tower, Ouija board apron, Seance table with crystal ball',
+    credits: [
+      { role: 'Designer', name: 'Karl DeAngelo' },
+      { role: 'Software', name: 'Eric Priepke' },
+      { role: 'Artwork', name: 'Brad Albright' },
+      { role: 'Animation', name: 'Joshua Clay' },
+      { role: 'Sound', name: 'Jeff Dodson' },
+    ],
+  },
+  'spooky-bj': {
+    year: 2025,
+    description: 'It\'s showtime! Dive into Tim Burton\'s iconic 1988 film with a pinball-eating Sandworm, Dante\'s Inferno wheel, and the Beetlejuice sculpt that rises from his gravestone to fling balls.',
+    features: '2 flippers, motorized Sandworm, Dante\'s Inferno roulette, couch ball lock, magnet ball save, Spooky Speak voice recognition topper',
+    credits: [
+      { role: 'Designers', name: 'Spooky Luke & Corwin "Bug" Emery' },
+      { role: 'Programmers', name: 'Spooky DJ & Casey Butler' },
+      { role: 'Artwork', name: 'Christopher Franchi' },
+      { role: 'Sound', name: 'Brady Hearn' },
+    ],
+  },
+  'stern-dnd': {
+    year: 2025,
+    description: 'Roll for initiative! Battle the Tyrant\'s Eye in this epic dungeon-crawling pinball adventure inspired by the world\'s greatest roleplaying game.',
+    features: '3 flippers, dragon toy, dungeon subway, spell casting, character selection, multiball mayhem',
+    credits: [
+      { role: 'Designer', name: 'Brian Eddy' },
+      { role: 'Software', name: 'Dwight Sullivan' },
+      { role: 'Artwork', name: 'Vincent Proce' },
+      { role: 'Music', name: 'Cris Velasco' },
+      { role: 'Voice', name: 'Matthew Mercer' },
+    ],
+  },
+  'stern-pokemon': {
+    year: 2026,
+    description: 'Gotta catch \'em all! Join Ash on a pinball journey through the Pokémon world with an animatronic Pikachu, Poké Ball mechanics, and Team Rocket battles.',
+    features: 'Animatronic Pikachu, Poké Ball launcher, Team Rocket features, Pokémon-themed ramps',
+    credits: [
+      { role: 'Designers', name: 'Jack Danger & George Gomez' },
+      { role: 'Software', name: 'Tanio Klyce' },
+    ],
+  },
+  'cgc-mm': {
+    year: 1997,
+    description: 'Widely held as one of the best pinball machines of all time. Battle for the kingdom with exploding castles, motorized drawbridge, and pop-up trolls. Merlin Edition remake by Chicago Gaming.',
+    features: '3 flippers, exploding castle, motorized drawbridge, 2 pop-up trolls, RGB lighting (Merlin Edition)',
+    credits: [
+      { role: 'Designer', name: 'Brian Eddy' },
+      { role: 'Programmer', name: 'Lyman F. Sheats Jr.' },
+      { role: 'Artwork', name: 'Greg Freres & John Youssi' },
+      { role: 'Sound', name: 'Dan Forden' },
+    ],
+  },
+  'bof-dune': {
+    year: 2025,
+    description: 'Harness desert power on Arrakis. Featuring a ball-eating Sandworm with magnetic capture, interactive Harkonnen Harvester, and Hans Zimmer\'s iconic score.',
+    features: '3 flippers, 6 balls, 4 magnets, ball-eating Sandworm, Harkonnen Harvester jump ramp, Thumper Bumper, Bene Gesserit Pain Box, 14.9" backboard display',
+    credits: [
+      { role: 'Designers', name: 'David Van Es & Travis Moseman' },
+      { role: 'Software', name: 'Phil Grimaldi & Bowen Kerins' },
+      { role: 'Artwork', name: 'Jonathan Bergeron' },
+      { role: 'Music', name: 'Adrian Disch' },
+      { role: 'Toys', name: 'Brian Savage' },
+    ],
+  },
+  'stern-metallica': {
+    year: 2013,
+    description: 'Heavy metal pinball at its finest. Ride the Lightning, Enter Sandman, and battle through Metallica\'s greatest hits in this hard-rocking, fast-playing machine.',
+    features: '3 flippers, electric chair, snake, Sparky, coffin lock, guitar pick spinner',
+    credits: [
+      { role: 'Designer', name: 'John Borg' },
+      { role: 'Programmer', name: 'Lyman Sheats' },
+      { role: 'Artwork', name: 'Dirty Donny Gillies' },
+    ],
+  },
+  'stern-godzilla': {
+    year: 2021,
+    description: 'The King of Monsters stomps onto the playfield! Battle through Godzilla\'s most iconic movie moments with deep rules, innovative mechs, and massive multiball action.',
+    features: '3 flippers, Godzilla mech, building destruction, Mechagodzilla, bridge ramp',
+    credits: [
+      { role: 'Designer', name: 'Keith Elwin' },
+      { role: 'Software', name: 'Rick Naegele' },
+      { role: 'Artwork', name: 'Jeremy Packer (Zombie Yeti)' },
+      { role: 'Sound', name: 'Jerry Thompson' },
+    ],
+  },
+  'stern-jaws': {
+    year: 2024,
+    description: 'You\'re gonna need a bigger boat. Hunt the great white shark in this thrilling pinball tribute to Steven Spielberg\'s classic, featuring original film footage and Richard Dreyfuss callouts.',
+    features: '3 flippers, shark mech, Orca boat, barrel targets, beach panic',
+    credits: [
+      { role: 'Designer', name: 'Keith Elwin' },
+      { role: 'Software', name: 'Rick Naegele & Elizabeth Gieske' },
+      { role: 'Artwork', name: 'Michael Barnard' },
+      { role: 'Sound', name: 'Jerry Thompson' },
+      { role: 'Voice', name: 'Richard Dreyfuss' },
+    ],
+  },
 };
 
 // Per-game color palettes for score rows
@@ -613,11 +902,13 @@ function showDetail(gameName, isAutoCycle) {
   const [name, game] = entry;
   const isJjp = game.source === 'jjp';
   const gameKey = game.machine_id || game.title_code || name;
-  const assets = isJjp ? (JJP_ASSETS[gameKey] || {}) : game;
+  const assets = JJP_ASSETS[gameKey] || {};
   const bg = assets.primary_background || game.primary_background || '';
   const logo = assets.square_logo || game.square_logo || '';
+  const playfieldImg = assets.playfield || '';
   const displayName = game.display_name || name;
   const subtitle = buildSubtitle(game);
+  const info = GAME_INFO[gameKey] || {};
 
   let html = isAutoCycle ? '' : '<div class="detail-back" onclick="hideDetail()">← Back to Leaderboard</div>';
   html += '<div class="detail-card">';
@@ -640,7 +931,20 @@ function showDetail(gameName, isAutoCycle) {
   }
   html += '</div></div>';
 
-  // Build score rows helper — shows Grand Champion + ranks 1-10 (11 total)
+  // 3-column body
+  html += '<div class="detail-body">';
+
+  // LEFT: Playfield image
+  html += '<div class="detail-playfield">';
+  if (playfieldImg) {
+    html += `<img src="${playfieldImg}" alt="${escapeHtml(displayName)} playfield" loading="lazy">`;
+  }
+  html += '</div>';
+
+  // CENTER: Leaderboards
+  html += '<div class="detail-center">';
+
+  // Build score rows helper
   const theme = getTheme(name);
   function buildScoreRows(scoreList, limit) {
     let rows = '';
@@ -673,14 +977,14 @@ function showDetail(gameName, isAutoCycle) {
   // Side-by-side leaderboards
   html += '<div class="lb-columns">';
 
-  // All Time column (left)
+  // All Time column
   html += '<div class="lb-column">';
   html += '<div class="lb-column-title alltime">🏆 All Time</div>';
   html += '<div class="detail-scores">';
   html += buildScoreRows(game.alltime_scores || game.scores, 11);
   html += '</div></div>';
 
-  // Current Month column (right)
+  // Current Month column
   html += '<div class="lb-column">';
   html += `<div class="lb-column-title monthly">📅 ${monthLabel}</div>`;
   html += '<div class="detail-scores">';
@@ -696,7 +1000,37 @@ function showDetail(gameName, isAutoCycle) {
     html += `<div class="detail-updated">Last Updated: ${ts}</div>`;
   }
 
-  html += '</div>';
+  html += '</div>'; // end detail-center
+
+  // RIGHT: About the game
+  html += '<div class="detail-about">';
+  html += '<div class="detail-about-title">About the Game</div>';
+  if (info.year) {
+    html += `<div class="detail-about-year">⚡ ${info.year} · ${escapeHtml(game.manufacturer || '')}</div>`;
+  }
+  if (info.description) {
+    html += `<div class="detail-about-desc">${escapeHtml(info.description)}</div>`;
+  }
+  if (info.features) {
+    html += '<div class="detail-about-section">';
+    html += '<div class="detail-about-section-title">🎯 Features</div>';
+    html += `<div class="detail-about-features">${escapeHtml(info.features)}</div>`;
+    html += '</div>';
+  }
+  if (info.credits && info.credits.length > 0) {
+    html += '<div class="detail-about-section">';
+    html += '<div class="detail-about-section-title">🎬 Credits</div>';
+    html += '<ul class="detail-credits">';
+    info.credits.forEach(c => {
+      html += `<li><span class="credit-role">${escapeHtml(c.role)}</span><span class="credit-name">${escapeHtml(c.name)}</span></li>`;
+    });
+    html += '</ul>';
+    html += '</div>';
+  }
+  html += '</div>'; // end detail-about
+
+  html += '</div>'; // end detail-body
+  html += '</div>'; // end detail-card
 
   // Hide carousel, show detail
   document.getElementById('carousel-container').style.display = 'none';
