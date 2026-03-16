@@ -13,4 +13,4 @@ RestartSec=10
 Environment=DISPLAY=:0
 
 [Install]
-WantedBy=graphical.target
+WantedBy=multi-user.target

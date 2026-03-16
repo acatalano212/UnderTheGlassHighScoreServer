@@ -35,6 +35,7 @@ body{
 }
 .banner-brand{
   display:flex;align-items:center;gap:.6rem;
+  flex:0 0 120px;
 }
 .banner-brand .brand-logo{height:50px;object-fit:contain}
 .banner-center{text-align:center;flex:1 1 auto}
@@ -46,6 +47,7 @@ body{
 }
 .banner-right{
   font-size:.85rem;color:#8b949e;letter-spacing:.08em;text-align:right;
+  flex:0 0 120px;
 }
 
 /* ------------------------------------------------------------------ grid */
@@ -256,8 +258,8 @@ body{
   display:grid;
   grid-template-columns:30% 1fr 25%;
   gap:1.5rem;
-  align-items:start;
-  min-height:0;
+  align-items:center;
+  min-height:calc(100vh - 140px);
   overflow:hidden;
 }
 .detail-machine{
@@ -283,7 +285,7 @@ body{
 }
 .detail-header{
   position:relative;
-  height:130px;
+  height:180px;
   display:flex;
   align-items:center;
   padding:0 1.5rem;
@@ -370,41 +372,41 @@ body{
   min-width:0;
 }
 .detail-about-title{
-  font-size:1.15rem;font-weight:700;text-transform:uppercase;
+  font-size:1.4rem;font-weight:700;text-transform:uppercase;
   letter-spacing:.12em;color:#58a6ff;
   padding-bottom:.5rem;border-bottom:2px solid rgba(255,255,255,.1);
 }
 .detail-about-desc{
-  font-size:1rem;color:#bbb;line-height:1.5;
+  font-size:1.15rem;color:#bbb;line-height:1.55;
   font-family:'Oswald',sans-serif;
 }
 .detail-about-section{
   margin-top:.3rem;
 }
 .detail-about-section-title{
-  font-size:.95rem;font-weight:700;text-transform:uppercase;
+  font-size:1.1rem;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:#8b949e;margin-bottom:.4rem;
 }
 .detail-about-features{
-  font-size:.95rem;color:#bbb;line-height:1.5;
+  font-size:1.1rem;color:#bbb;line-height:1.55;
   font-family:'Oswald',sans-serif;
 }
 .detail-about-year{
-  font-size:1.05rem;color:#f0c040;font-weight:700;
+  font-size:1.2rem;color:#f0c040;font-weight:700;
 }
 .detail-credits{
   list-style:none;padding:0;margin:0;
 }
 .detail-credits li{
-  padding:.3rem 0;
-  font-size:.95rem;
+  padding:.35rem 0;
+  font-size:1.05rem;
   border-bottom:1px solid rgba(255,255,255,.04);
   display:flex;gap:.5rem;
 }
 .detail-credits li:last-child{border-bottom:none}
 .credit-role{
   color:#8b949e;font-weight:600;min-width:100px;flex-shrink:0;
-  text-transform:uppercase;font-size:.8rem;letter-spacing:.05em;
+  text-transform:uppercase;font-size:.9rem;letter-spacing:.05em;
   padding-top:2px;
 }
 .credit-name{
@@ -419,12 +421,12 @@ body{
   margin-top:.6rem;
 }
 .detail-funfact-title{
-  font-size:.9rem;font-weight:700;text-transform:uppercase;
+  font-size:1.05rem;font-weight:700;text-transform:uppercase;
   letter-spacing:.1em;color:#58a6ff;margin-bottom:.4rem;
   font-family:'Oswald',sans-serif;
 }
 .detail-funfact-text{
-  font-size:.95rem;color:#bbb;line-height:1.5;
+  font-size:1.05rem;color:#bbb;line-height:1.55;
   font-family:'Oswald',sans-serif;
   font-style:italic;
 }
@@ -614,7 +616,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'Step into a world of spells, secrets, and sorcery. This masterpiece transforms the magical world of Hogwarts into an immersive, action-packed pinball experience covering all eight films.',
     features: '3 flippers, 6 balls, moving Hedwig, flying Snitch, interactive castle, Deathly Hallows insert with 38 LEDs',
-    funFact: 'The game features over 100 voice quotes from the Harry Potter films and took more than 3 years to develop — one of the longest development cycles in JJP history.',
+    funFacts: [
+      'The game features over 100 voice quotes from the Harry Potter films and took more than 3 years to develop — one of the longest development cycles in JJP history.',
+      'The interactive Hedwig toy on the playfield has motorized wings that flap and a head that turns to track the ball during gameplay.',
+      'Designer Eric Meunier hid a secret Marauder\'s Map Easter egg in the rules — a special mode that reveals hidden shots on the playfield.',
+      'The game\'s castle toy features 38 individually addressable LEDs inside the Deathly Hallows insert, creating over 1,000 unique lighting patterns.',
+      'JJP consulted with Warner Bros. for over a year to ensure every detail — from wand movements to spell effects — was faithful to the films.',
+    ],
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Lead Programmer', name: 'Joe Katz' },
@@ -628,7 +636,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'The ultimate Collector\'s Edition with exclusive MinaLima artwork, premium foil elements, interactive topper with Dark Mark projector, and hand-numbered signed plaque. Limited production.',
     features: '3 flippers, 6 balls, animated Hedwig, death eater mark projection, Snitch topper, surround sound',
-    funFact: 'The CE artwork was created by MinaLima — the same graphic design studio that crafted every prop, poster, and newspaper seen in all eight Harry Potter films.',
+    funFacts: [
+      'The CE artwork was created by MinaLima — the same graphic design studio that crafted every prop, poster, and newspaper seen in all eight Harry Potter films.',
+      'Only a limited number of Collector\'s Editions were produced, each with a hand-numbered plaque signed by the JJP design team.',
+      'The Dark Mark projector in the topper casts a moving skull-and-serpent image onto the ceiling above the machine during certain game modes.',
+      'The CE features a surround sound system with dedicated subwoofer — a first for any JJP pinball machine.',
+      'MinaLima founders Miraphora Mina and Eduardo Lima personally approved every artwork element to match their original Harry Potter film designs.',
+    ],
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Lead Programmer', name: 'Joe Katz' },
@@ -642,7 +656,13 @@ const GAME_INFO = {
     year: 2024,
     description: 'Battle for Pandora in this immersive pinball experience inspired by James Cameron\'s Avatar. Connect with Eywa and defend the Na\'vi homeland against the RDA.',
     features: '3 flippers, interactive Ikran, Banshee ramp, Tree of Souls, RGB lighting',
-    funFact: 'The game\'s Ikran creature toy has motorized wings that physically flap during gameplay, making it one of the most complex animated toys ever put on a pinball playfield.',
+    funFacts: [
+      'The game\'s Ikran creature toy has motorized wings that physically flap during gameplay, making it one of the most complex animated toys ever put on a pinball playfield.',
+      'Avatar is one of the few pinball machines that uses UV-reactive playfield art — certain elements glow under blacklight LEDs during Pandora night scenes.',
+      'The Tree of Souls centerpiece contains over 50 fiber optic strands that pulse in sync with the game\'s music during Eywa modes.',
+      'James Cameron\'s film team provided JJP with exclusive 3D assets to ensure the Na\'vi characters were screen-accurate.',
+      'The game features a unique "bond with Eywa" mechanic where the player must hold both flipper buttons simultaneously — representing the neural connection in the film.',
+    ],
     credits: [
       { role: 'Designer', name: 'Mark Seiden' },
       { role: 'Software', name: 'Keith Johnson' },
@@ -655,7 +675,13 @@ const GAME_INFO = {
     year: 2023,
     description: 'An offer you can\'t refuse. Experience the Corleone family saga in this cinematic pinball masterpiece featuring iconic scenes from the legendary film trilogy.',
     features: '3 flippers, horse head scoop, Baptism multiball, Connie\'s wedding, desk lamp',
-    funFact: 'Slash from Guns N\' Roses recorded an original guitar solo exclusively for this game\'s soundtrack — he\'s a serious pinball collector with over 100 machines.',
+    funFacts: [
+      'Slash from Guns N\' Roses recorded an original guitar solo exclusively for this game\'s soundtrack — he\'s a serious pinball collector with over 100 machines.',
+      'The desk lamp on the playfield is an actual working miniature replica of the lamp from Don Corleone\'s office in the film.',
+      'The horse head scoop shot recreates one of cinema\'s most infamous scenes — complete with dramatic lighting and Nino Rota\'s iconic score.',
+      'Designer Eric Meunier watched all three Godfather films over 30 times during development to capture every key moment in the game\'s rules.',
+      'The Baptism multiball mode plays out in real-time alongside the film\'s famous cross-cutting baptism/assassination sequence.',
+    ],
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Software', name: 'Keith P. Johnson' },
@@ -668,7 +694,13 @@ const GAME_INFO = {
     year: 2022,
     description: 'To infinity and beyond! Join Woody, Buzz, and the gang in this family-friendly pinball adventure featuring characters and scenes from Pixar\'s beloved franchise.',
     features: '3 flippers, carnival ramp, Forky toy, Bo Peep, Duke Caboom jump ramp',
-    funFact: 'Designer Pat Lawlor is a Pinball Hall of Famer who also created The Addams Family — the best-selling pinball machine of all time with over 20,000 units produced.',
+    funFacts: [
+      'Designer Pat Lawlor is a Pinball Hall of Famer who also created The Addams Family — the best-selling pinball machine of all time with over 20,000 units produced.',
+      'The carnival ramp is designed to feel like the midway games Woody and the gang encounter at the carnival in Toy Story 4.',
+      'Duke Caboom\'s jump ramp is one of the steepest ramp angles in modern pinball — launching the ball nearly vertical before it lands.',
+      'Forky\'s spork toy on the playfield wobbles realistically when hit by the ball, just like the anxious character in the film.',
+      'This was the last pinball machine designed by Pat Lawlor for JJP, capping a legendary career spanning over 35 years in the industry.',
+    ],
     credits: [
       { role: 'Designer', name: 'Pat Lawlor' },
       { role: 'Software', name: 'Rick Bartlett' },
@@ -680,7 +712,13 @@ const GAME_INFO = {
     year: 2023,
     description: 'A rocket man-sized celebration of Sir Elton John\'s legendary career. Experience decades of iconic music through an electrifying concert-themed pinball show.',
     features: '3 flippers, piano ramp, concert stage, Bennie and the Jets, Crocodile Rock',
-    funFact: 'Designer Steve Ritchie is a Pinball Hall of Famer nicknamed "The King of Flow" — he also created Black Knight, Firepower, and Spider-Man.',
+    funFacts: [
+      'Designer Steve Ritchie is a Pinball Hall of Famer nicknamed "The King of Flow" — he also created Black Knight, Firepower, and Spider-Man.',
+      'Elton John personally approved the game\'s song selection and even suggested adding "Saturday Night\'s Alright for Fighting" as a wizard mode.',
+      'The piano ramp was engineered to make musical tones as the ball rolls across it — each section produces a different note.',
+      'The concert stage lighting on the playfield uses over 150 RGB LEDs synchronized to the music for an authentic concert experience.',
+      'Sir Elton John has his own pinball collection at home and reportedly played the prototype for over an hour during his first visit to JJP.',
+    ],
     credits: [
       { role: 'Designer', name: 'Steve Ritchie' },
       { role: 'Software', name: 'Bill Grupp' },
@@ -693,7 +731,13 @@ const GAME_INFO = {
     year: 2018,
     description: 'Set sail on a high-seas adventure with 22 playable characters. Battle Davy Jones, navigate multiball chaos, and chase the Dead Man\'s Chest in JJP\'s most ambitious layout.',
     features: '3 flippers, spinning disc map, rocking ship, treasure trunk lock, cannon shot',
-    funFact: 'With 22 playable characters, this game has more selectable characters than any other pinball machine ever made.',
+    funFacts: [
+      'With 22 playable characters, this game has more selectable characters than any other pinball machine ever made.',
+      'The spinning disc map toy is a functional compass that rotates to point toward the currently active shot on the playfield.',
+      'The rocking ship mechanism uses a custom motor assembly that physically tilts the ship toy during stormy sea modes.',
+      'Designer Eric Meunier spent time on the actual Pirates of the Caribbean ride at Disneyland to capture the atmosphere for the game.',
+      'The treasure trunk ball lock mechanism was inspired by real 18th-century chest latches — it physically opens and closes during gameplay.',
+    ],
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Software', name: 'Keith Johnson' },
@@ -705,7 +749,13 @@ const GAME_INFO = {
     year: 2020,
     description: 'Welcome to the jungle! A concert-like pinball experience celebrating Guns N\' Roses with advanced lighting, pounding audio, and rock \'n\' roll gameplay.',
     features: '3 flippers, concert stage, guitar ramp, crowd surfing, pyrotechnic lighting',
-    funFact: 'The game\'s concert stage lighting uses over 200 individually addressable RGB LEDs to simulate real pyrotechnic effects during multiball.',
+    funFacts: [
+      'The game\'s concert stage lighting uses over 200 individually addressable RGB LEDs to simulate real pyrotechnic effects during multiball.',
+      'Slash personally visited the JJP factory during development and suggested adding "Paradise City" as the final wizard mode song.',
+      'The guitar ramp was designed to mimic the shape of Slash\'s iconic Gibson Les Paul guitar.',
+      'GNR was the first JJP game to feature a "crowd noise" audio layer that gets louder as your score increases, simulating a growing concert audience.',
+      'The game includes 12 complete Guns N\' Roses songs — one of the largest licensed music libraries in pinball history.',
+    ],
     credits: [
       { role: 'Designer', name: 'Eric Meunier' },
       { role: 'Software', name: 'Keith Johnson' },
@@ -717,7 +767,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'Explore the mysterious Winchester Mystery House — the Gothic mansion in San Jose known for its architectural curiosities and haunted legends. Features a Pepper\'s Ghost display effect.',
     features: '3 full flippers, 1 mini-flipper, revolving hallway turntable, collapsing tower, Ouija board apron, Seance table with crystal ball',
-    funFact: 'The real Winchester Mystery House has 161 rooms, 2,000 doors, and 10,000 windows. Construction ran 24 hours a day, 7 days a week, for 38 straight years.',
+    funFacts: [
+      'The real Winchester Mystery House has 161 rooms, 2,000 doors, and 10,000 windows. Construction ran 24 hours a day, 7 days a week, for 38 straight years.',
+      'The game uses a Pepper\'s Ghost illusion — the same technique used in Disney\'s Haunted Mansion — to create ghostly apparitions on the playfield.',
+      'The revolving hallway turntable physically rotates during gameplay, changing which ramps and targets are accessible.',
+      'Sarah Winchester believed she was haunted by the ghosts of those killed by Winchester rifles. She held nightly séances, which inspired the Séance table feature in the game.',
+      'The Ouija board apron beneath the flippers has embedded LEDs that spell out messages during certain game modes.',
+    ],
     credits: [
       { role: 'Designer', name: 'Karl DeAngelo' },
       { role: 'Software', name: 'Eric Priepke' },
@@ -730,7 +786,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'It\'s showtime! Dive into Tim Burton\'s iconic 1988 film with a pinball-eating Sandworm, Dante\'s Inferno wheel, and the Beetlejuice sculpt that rises from his gravestone to fling balls.',
     features: '2 flippers, motorized Sandworm, Dante\'s Inferno roulette, couch ball lock, magnet ball save, Spooky Speak voice recognition topper',
-    funFact: 'The optional "Spooky Speak" topper uses voice recognition — say "Beetlejuice" three times and the game triggers a special mode, just like the movie.',
+    funFacts: [
+      'The optional "Spooky Speak" topper uses voice recognition — say "Beetlejuice" three times and the game triggers a special mode, just like the movie.',
+      'Spooky Pinball is one of the smallest pinball manufacturers in the world, operating out of Benton, Wisconsin with a team of fewer than 30 people.',
+      'The motorized Sandworm toy physically "eats" the pinball and spits it out from a different location — one of the most unique ball diversions in pinball.',
+      'Artist Christopher Franchi hand-painted the cabinet and backglass artwork, giving it a style that matches Tim Burton\'s original film aesthetic.',
+      'The Dante\'s Inferno roulette wheel randomly assigns multipliers and modes — no two games ever play exactly the same way.',
+    ],
     credits: [
       { role: 'Designers', name: 'Spooky Luke & Corwin "Bug" Emery' },
       { role: 'Programmers', name: 'Spooky DJ & Casey Butler' },
@@ -742,7 +804,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'Roll for initiative! Battle the Tyrant\'s Eye in this epic dungeon-crawling pinball adventure inspired by the world\'s greatest roleplaying game.',
     features: '3 flippers, dragon toy, dungeon subway, spell casting, character selection, multiball mayhem',
-    funFact: 'Designer Brian Eddy also created Medieval Madness and Attack from Mars — two of the most beloved and valuable pinball machines ever made.',
+    funFacts: [
+      'Designer Brian Eddy also created Medieval Madness and Attack from Mars — two of the most beloved and valuable pinball machines ever made.',
+      'Voice actor Matthew Mercer (Critical Role) recorded custom Dungeon Master narration for the game, bringing his signature D&D style to pinball.',
+      'The dragon toy on the playfield breathes real LED "fire" — a cone of flickering orange and red lights triggered during dragon encounters.',
+      'Players choose a character class at the start of each game (Fighter, Wizard, Rogue, or Cleric), and each class changes the game\'s rules and scoring.',
+      'The dungeon subway hidden beneath the playfield is the longest ball travel path in any Stern pinball machine — the ball disappears for nearly 3 seconds.',
+    ],
     credits: [
       { role: 'Designer', name: 'Brian Eddy' },
       { role: 'Software', name: 'Dwight Sullivan' },
@@ -755,7 +823,13 @@ const GAME_INFO = {
     year: 2026,
     description: 'Gotta catch \'em all! Join Ash on a pinball journey through the Pokémon world with an animatronic Pikachu, Poké Ball mechanics, and Team Rocket battles.',
     features: 'Animatronic Pikachu, Poké Ball launcher, Team Rocket features, Pokémon-themed ramps',
-    funFact: 'The animatronic Pikachu on the playfield physically reacts to your gameplay — its ears perk up, it turns to watch the ball, and it cheers when you score big.',
+    funFacts: [
+      'The animatronic Pikachu on the playfield physically reacts to your gameplay — its ears perk up, it turns to watch the ball, and it cheers when you score big.',
+      'This is the first officially licensed Pokémon pinball machine since the Pokémon Pinball video games on Game Boy in 1999.',
+      'The Poké Ball launcher replaces the traditional plunger — players physically twist and release it to "throw" the ball onto the playfield.',
+      'Designers Jack Danger and George Gomez collaborated on the layout — combining Danger\'s creative innovations with Gomez\'s decades of design experience.',
+      'The game features over 150 Pokémon that appear on the LCD display throughout gameplay, each with unique animations and point values.',
+    ],
     credits: [
       { role: 'Designers', name: 'Jack Danger & George Gomez' },
       { role: 'Software', name: 'Tanio Klyce' },
@@ -765,7 +839,13 @@ const GAME_INFO = {
     year: 1997,
     description: 'Widely held as one of the best pinball machines of all time. Battle for the kingdom with exploding castles, motorized drawbridge, and pop-up trolls. Merlin Edition remake by Chicago Gaming.',
     features: '3 flippers, exploding castle, motorized drawbridge, 2 pop-up trolls, RGB lighting (Merlin Edition)',
-    funFact: 'Original 1997 Medieval Madness machines regularly sell for over $20,000. Only 4,016 were ever made — making it one of the most sought-after pins in existence.',
+    funFacts: [
+      'Original 1997 Medieval Madness machines regularly sell for over $20,000. Only 4,016 were ever made — making it one of the most sought-after pins in existence.',
+      'The castle destruction toy uses a motor to physically collapse the castle walls when you defeat them — then rebuilds itself for the next battle.',
+      'The two pop-up trolls under the playfield are controlled by solenoids that launch them up through holes to block your shots at random.',
+      'Chicago Gaming\'s Merlin Edition remake added full RGB LED lighting and a modernized LCD display while keeping the original layout and rules intact.',
+      'Programmer Lyman Sheats hid a secret "Royal Madness" wizard mode that requires destroying all castles in a single game — fewer than 1% of players have ever reached it.',
+    ],
     credits: [
       { role: 'Designer', name: 'Brian Eddy' },
       { role: 'Programmer', name: 'Lyman F. Sheats Jr.' },
@@ -777,7 +857,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'Harness desert power on Arrakis. Featuring a ball-eating Sandworm with magnetic capture, interactive Harkonnen Harvester, and Hans Zimmer\'s iconic score.',
     features: '3 flippers, 6 balls, 4 magnets, ball-eating Sandworm, Harkonnen Harvester jump ramp, Thumper Bumper, Bene Gesserit Pain Box, 14.9" backboard display',
-    funFact: 'The Sandworm toy uses magnetic technology to physically capture and swallow the pinball — then spits it back out from a different location on the playfield.',
+    funFacts: [
+      'The Sandworm toy uses magnetic technology to physically capture and swallow the pinball — then spits it back out from a different location on the playfield.',
+      'The game features Hans Zimmer\'s iconic Dune film score — one of the most critically acclaimed soundtracks in modern cinema history.',
+      'With 4 magnets, 6 balls, and a 14.9-inch backboard display, this is one of the most feature-packed pinball machines ever built by any manufacturer.',
+      'The Thumper Bumper is based on the thumpers used to attract sandworms in the Dune universe — in the game, it vibrates the playfield when activated.',
+      'The Bene Gesserit Pain Box is a magnetic ball trap that holds the ball while the player must press a button at the right moment — testing their reflexes like the Gom Jabbar test.',
+    ],
     credits: [
       { role: 'Designers', name: 'David Van Es & Travis Moseman' },
       { role: 'Software', name: 'Phil Grimaldi & Bowen Kerins' },
@@ -790,7 +876,13 @@ const GAME_INFO = {
     year: 2013,
     description: 'Heavy metal pinball at its finest. Ride the Lightning, Enter Sandman, and battle through Metallica\'s greatest hits in this hard-rocking, fast-playing machine.',
     features: '3 flippers, electric chair, snake, Sparky, coffin lock, guitar pick spinner',
-    funFact: 'The 2024 Remastered edition added 8 new songs, a full-color LCD, and new game modes — including tracks from Grammy-winning album 72 Seasons.',
+    funFacts: [
+      'The 2024 Remastered edition added 8 new songs, a full-color LCD, and new game modes — including tracks from Grammy-winning album 72 Seasons.',
+      'The electric chair toy on the playfield sparks with real LED lightning effects when the ball hits it — one of the most dramatic toys in modern pinball.',
+      'The original 2013 Metallica was Stern\'s best-selling machine of that decade, with multiple production runs to meet demand.',
+      'The snake toy coils around a post on the playfield and strikes at the ball when activated — its movement is driven by a hidden solenoid mechanism.',
+      'Metallica band members visited the Stern factory and Lars Ulrich reportedly played the prototype for three hours straight during their first visit.',
+    ],
     credits: [
       { role: 'Designer', name: 'John Borg' },
       { role: 'Programmer', name: 'Lyman Sheats' },
@@ -801,7 +893,13 @@ const GAME_INFO = {
     year: 2021,
     description: 'The King of Monsters stomps onto the playfield! Battle through Godzilla\'s most iconic movie moments with deep rules, innovative mechs, and massive multiball action.',
     features: '3 flippers, Godzilla mech, building destruction, Mechagodzilla, bridge ramp',
-    funFact: 'This was the first Stern pinball to debut the Insider Connected online platform, which now connects over 100,000 pinball players worldwide.',
+    funFacts: [
+      'This was the first Stern pinball to debut the Insider Connected online platform, which now connects over 100,000 pinball players worldwide.',
+      'Designer Keith Elwin was the #1 ranked competitive pinball player in the world before transitioning to game design at Stern.',
+      'The Godzilla mech toy on the playfield stands over 6 inches tall and physically swipes at the ball with its arm during battle modes.',
+      'The building destruction feature uses magnets to hold steel targets upright — when "destroyed," the magnets release and the buildings collapse dramatically.',
+      'The game\'s code has been updated over 30 times since release, adding new modes, fixing balance, and expanding the ruleset — one of Stern\'s most actively developed titles.',
+    ],
     credits: [
       { role: 'Designer', name: 'Keith Elwin' },
       { role: 'Software', name: 'Rick Naegele' },
@@ -813,7 +911,13 @@ const GAME_INFO = {
     year: 2024,
     description: 'You\'re gonna need a bigger boat. Hunt the great white shark in this thrilling pinball tribute to Steven Spielberg\'s classic, featuring original film footage and Richard Dreyfuss callouts.',
     features: '3 flippers, shark mech, Orca boat, barrel targets, beach panic',
-    funFact: 'Designer Keith Elwin was the #1 ranked competitive pinball player in the world before becoming one of pinball\'s most acclaimed game designers.',
+    funFacts: [
+      'Designer Keith Elwin was the #1 ranked competitive pinball player in the world before becoming one of pinball\'s most acclaimed game designers.',
+      'Richard Dreyfuss returned to voice his character Matt Hooper with brand-new recordings made exclusively for this pinball machine.',
+      'The shark mech physically lunges out of the playfield and "bites" the ball — one of the most dramatic mechanical toys in any Stern game.',
+      'The Orca boat toy on the playfield rocks back and forth during stormy sea modes, driven by a hidden cam mechanism beneath the surface.',
+      'Jaws was the 50th anniversary celebration of the 1975 film and includes an exclusive tribute mode with behind-the-scenes film facts narrated by Dreyfuss.',
+    ],
     credits: [
       { role: 'Designer', name: 'Keith Elwin' },
       { role: 'Software', name: 'Rick Naegele & Elizabeth Gieske' },
@@ -826,7 +930,13 @@ const GAME_INFO = {
     year: 2018,
     description: 'The Merc with a Mouth brings his outrageously funny offbeat humor to pinball. Team up with Wolverine, Domino, and Colossus to battle Juggernaut, Sabretooth, and Mr. Sinister.',
     features: '3 flippers, Lil\' Deadpool bash toy, drop target bank, dual ramps, Katana Sword ramp return, time machine quests',
-    funFact: 'Voice actor Nolan North recorded over 500 custom voice lines for this game — including Deadpool breaking the fourth wall to comment on your pinball skills.',
+    funFacts: [
+      'Voice actor Nolan North recorded over 500 custom voice lines for this game — including Deadpool breaking the fourth wall to comment on your pinball skills.',
+      'Deadpool is one of the few pinball machines where the main character directly addresses the player — mocking missed shots and celebrating big scores.',
+      'The Lil\' Deadpool bash toy on the playfield is a miniature Deadpool figure that wobbles and taunts the player when struck by the ball.',
+      'Designer George Gomez has been designing pinball machines for over 30 years and is responsible for some of Stern\'s biggest hits including Batman and Spider-Man.',
+      'The game\'s time machine quests are a nod to the comic book storylines where Deadpool travels through time — each quest has unique rules and scoring.',
+    ],
     credits: [
       { role: 'Designer', name: 'George Gomez' },
       { role: 'Software', name: 'Tanio Klyce' },
@@ -838,7 +948,13 @@ const GAME_INFO = {
     year: 2023,
     description: 'The Foo Fighters concert experience in pinball form. Featuring 15 iconic songs, hand-drawn art, and creative input from every band member including the late Taylor Hawkins.',
     features: '3 flippers, concert stage, guitar pick spinner, crowd surf ramp, drum kit toy',
-    funFact: 'Dave Grohl and the band provided creative input throughout the 2+ year development. The game is also a tribute to drummer Taylor Hawkins, who passed during production.',
+    funFacts: [
+      'Dave Grohl and the band provided creative input throughout the 2+ year development. The game is also a tribute to drummer Taylor Hawkins, who passed during production.',
+      'The game features 15 complete Foo Fighters songs — the most licensed tracks ever included in a Stern pinball machine.',
+      'Artist Jeremy Packer (Zombie Yeti) hand-drew all the artwork in his signature style, giving the game a unique concert poster aesthetic.',
+      'The drum kit toy on the playfield is a miniature replica of Taylor Hawkins\' actual drum setup, with moving drumsticks that play along during songs.',
+      'Designer Jack Danger named several hidden Easter egg modes after deep-cut Foo Fighters songs that aren\'t part of the main soundtrack.',
+    ],
     credits: [
       { role: 'Designer', name: 'Jack Danger' },
       { role: 'Software', name: 'Tim Sexton' },
@@ -849,7 +965,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'Journey to the mysterious Terror Island with Ann Darrow and Jack Driscoll. Features an animatronic King Kong with swinging arms, a giant spider, and a New York City train car that Kong flips over.',
     features: '3 flippers, animatronic Kong, magnetic spider trap, NYC train car, gong bash target, spiral ramp',
-    funFact: 'King Kong first appeared in 1932 and has influenced every medium of entertainment. This is his first-ever officially licensed pinball machine.',
+    funFacts: [
+      'King Kong first appeared in 1932 and has influenced every medium of entertainment. This is his first-ever officially licensed pinball machine.',
+      'The animatronic Kong toy has swinging arms that physically knock the ball across the playfield during battle modes.',
+      'Designer Keith Elwin built a custom prototype Kong mechanism in his home workshop before presenting it to Stern — it was approved on the spot.',
+      'The giant spider trap uses a magnetic grab to hold the ball in place while the spider toy descends from above — creating one of pinball\'s most dramatic moments.',
+      'The NYC train car that Kong flips over is one of the heaviest moving toys ever installed in a Stern machine, requiring a specially reinforced mounting bracket.',
+    ],
     credits: [
       { role: 'Designer', name: 'Keith Elwin' },
       { role: 'Software', name: 'Rick Naegele' },
@@ -860,7 +982,13 @@ const GAME_INFO = {
     year: 2022,
     description: 'Travel through time with Rush in this epic concert-under-glass featuring 16 iconic songs. Custom speech from Alex Lifeson, Geddy Lee, and Ed Robertson of Barenaked Ladies.',
     features: '3 flippers, electromagnetic Time Machine, Starman bash target, concert lighting, 16 songs',
-    funFact: 'Neil Peart\'s drum solo "Der Trommler" plays during one of the game\'s wizard modes — it was one of the last recordings he made before his passing in 2020.',
+    funFacts: [
+      'Neil Peart\'s drum solo "Der Trommler" plays during one of the game\'s wizard modes — it was one of the last recordings he made before his passing in 2020.',
+      'The electromagnetic Time Machine on the playfield uses a real magnet to grab and hold the ball before launching it at high speed into a ramp.',
+      'Rush bassist Geddy Lee and guitarist Alex Lifeson both recorded custom voice callouts exclusively for this game.',
+      'Designer John Borg hid a secret mode called "2112" that requires completing all missions in a specific order — a reference to Rush\'s legendary concept album.',
+      'The Starman bash target is shaped like the iconic figure from Rush\'s 2112 album cover and glows with embedded LEDs when activated.',
+    ],
     credits: [
       { role: 'Designer', name: 'John Borg' },
       { role: 'Software', name: 'Dwight Sullivan' },
@@ -872,7 +1000,13 @@ const GAME_INFO = {
     year: 2025,
     description: 'Save the galaxy in this epic pinball journey through the original Star Wars trilogy. Take down AT-ATs, destroy the Death Star II, escape Cloud City, and defeat the Empire.',
     features: '3 flippers, AT-AT crash ramp, Death Star multiball, Sarlacc Pit, hyperspace jump ramp, TIE fighter targets',
-    funFact: 'The game includes over 1,000 high-quality film and audio assets from the original trilogy — one of the largest media libraries ever integrated into a pinball machine.',
+    funFacts: [
+      'The game includes over 1,000 high-quality film and audio assets from the original trilogy — one of the largest media libraries ever integrated into a pinball machine.',
+      'Designer Steve Ritchie previously created the original Star Wars pinball for Data East in 1992 — making this a spiritual successor 33 years later.',
+      'The AT-AT crash ramp features a miniature AT-AT walker that physically collapses when you complete the Hoth battle sequence.',
+      'The Death Star multiball uses 4 balls simultaneously — representing the final assault on the Death Star II from Return of the Jedi.',
+      'The hyperspace jump ramp launches the ball through a spinning tunnel of LEDs that simulate the jump to lightspeed from the films.',
+    ],
     credits: [
       { role: 'Designer', name: 'Steve Ritchie' },
       { role: 'Software', name: 'Tim Sexton' },
@@ -882,7 +1016,13 @@ const GAME_INFO = {
     year: 2019,
     description: 'Experience the terrifying forces in Hawkins, Indiana. Search for Eleven, battle the Demogorgon, and uncover the secrets of the Upside Down in this supernatural pinball adventure.',
     features: '3 flippers, Demogorgon bash toy, rotating targets, video projector on playfield (Premium), telekinetic magnetic ball lock',
-    funFact: 'The Premium edition was the first pinball machine ever to feature a video projector that displays animations directly onto the playfield during gameplay.',
+    funFacts: [
+      'The Premium edition was the first pinball machine ever to feature a video projector that displays animations directly onto the playfield during gameplay.',
+      'The Demogorgon bash toy opens its "face petals" when struck by the ball — revealing a glowing red interior that mimics the creature from the show.',
+      'The game\'s telekinetic magnetic ball lock uses a hidden magnet to freeze the ball mid-playfield, simulating Eleven\'s psychic powers.',
+      'Designer John Borg binge-watched all seasons of Stranger Things multiple times to ensure every key scene was represented in the game\'s rules.',
+      'The rotating targets on the playfield represent the Upside Down — they physically flip to reveal a dark alternate version when the player enters Upside Down modes.',
+    ],
     credits: [
       { role: 'Designer', name: 'John Borg' },
       { role: 'Software', name: 'Lonnie Ropp' },
@@ -893,7 +1033,13 @@ const GAME_INFO = {
     year: 2023,
     description: 'Wreak havoc as Venom in this symbiote-powered pinball adventure. Battle Carnage, fight through an army of symbiotes, and prevent Knull, God of the Symbiotes, from taking over the world.',
     features: '3 flippers, Venom bash toy, symbiote targets, Carnage battle, magnetic ball catch',
-    funFact: 'The game features over 20 Marvel characters including Venomized versions of Hulk, Wolverine, and Captain America — more Marvel characters than any other Stern pinball.',
+    funFacts: [
+      'The game features over 20 Marvel characters including Venomized versions of Hulk, Wolverine, and Captain America — more Marvel characters than any other Stern pinball.',
+      'The Venom bash toy on the playfield has a tongue that extends when hit — a signature move from the comics and films.',
+      'Designer Jack Danger created a unique "symbiote bond" mechanic where the player\'s scoring multiplier grows the longer they keep the ball in play without draining.',
+      'The Carnage battle mode is one of the most intense timed challenges in modern pinball — players must hit specific shots in sequence before time runs out.',
+      'The magnetic ball catch simulates Venom\'s symbiote tendrils grabbing the ball — holding it suspended before redirecting it to a new location.',
+    ],
     credits: [
       { role: 'Designer', name: 'Jack Danger' },
       { role: 'Software', name: 'Tim Sexton' },
@@ -1189,10 +1335,11 @@ function showDetail(gameName, isAutoCycle) {
     html += '</ul>';
     html += '</div>';
   }
-  if (info.funFact) {
+  if (info.funFacts && info.funFacts.length > 0) {
+    const fact = info.funFacts[Math.floor(Math.random() * info.funFacts.length)];
     html += '<div class="detail-funfact">';
     html += '<div class="detail-funfact-title">Did You Know?</div>';
-    html += `<div class="detail-funfact-text">${escapeHtml(info.funFact)}</div>`;
+    html += `<div class="detail-funfact-text">${escapeHtml(fact)}</div>`;
     html += '</div>';
   }
   html += '</div>'; // end detail-about
