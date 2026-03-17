@@ -6,7 +6,6 @@
 
 import express from "express";
 import { readFileSync, existsSync, mkdirSync, writeFileSync, renameSync, unlinkSync } from "fs";
-import { writeFile, rename, unlink } from "fs/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { exec, execFile } from "child_process";
@@ -101,15 +100,15 @@ function loadScores() {
   return new Map();
 }
 
-// Async atomic write helper
-async function atomicWrite(filePath, data) {
+// Atomic write helper (sync — small files on Pi, keeps it simple)
+function atomicWriteSync(filePath, data) {
   const tmp = filePath + ".tmp";
   try {
-    await writeFile(tmp, JSON.stringify(data, null, 2), "utf-8");
-    await rename(tmp, filePath);
+    writeFileSync(tmp, JSON.stringify(data, null, 2), "utf-8");
+    renameSync(tmp, filePath);
   } catch (e) {
     console.error(`Failed to write ${filePath}:`, e.message);
-    try { await unlink(tmp); } catch {}
+    try { unlinkSync(tmp); } catch {}
     throw e;
   }
 }
@@ -122,9 +121,9 @@ function withWriteLock(fn) {
   return next;
 }
 
-async function saveScores(scoresMap) {
+function saveScores(scoresMap) {
   const obj = Object.fromEntries(scoresMap);
-  await atomicWrite(SCORES_FILE, obj);
+  atomicWriteSync(SCORES_FILE, obj);
 }
 
 // ---------------------------------------------------------------------------
@@ -142,15 +141,15 @@ function loadAllTime() {
   return {};
 }
 
-async function saveAllTime(data) {
-  await atomicWrite(ALLTIME_FILE, data);
+function saveAllTime(data) {
+  atomicWriteSync(ALLTIME_FILE, data);
 }
 
 let allTimeScores = loadAllTime();
 
 // Merge scores into all-time leaderboard for a game.
 // Keeps top 10 unique players by highest score ever seen.
-async function mergeAllTime(gameKey, newScores, gameMeta) {
+function mergeAllTime(gameKey, newScores, gameMeta) {
   const existing = allTimeScores[gameKey] || { scores: [] };
   const byPlayer = new Map();
 
@@ -183,7 +182,7 @@ async function mergeAllTime(gameKey, newScores, gameMeta) {
     scores: sorted,
     updated: new Date().toISOString(),
   };
-  await saveAllTime(allTimeScores);
+  saveAllTime(allTimeScores);
 }
 
 const JJP_COLORS= ["#740001","#ae0001","#eeba30","#1a472a","#2a623d","#222f5b","#5d5d5d"];
@@ -202,7 +201,7 @@ if (Object.keys(allTimeScores).length === 0) {
   console.log("Seeded all-time scores to", ALLTIME_FILE);
 }
 
-async function seedAllTimeData() {
+function seedAllTimeData() {
   const fakeAllTime = {
     "jjp-hp-we": {
       display_name: "Harry Potter (Wizard Edition)", manufacturer: "Jersey Jack Pinball",
@@ -408,7 +407,7 @@ async function seedAllTimeData() {
       updated: new Date().toISOString(),
     };
   }
-  await saveAllTime(allTimeScores);
+  saveAllTime(allTimeScores);
 }
 
 // ---------------------------------------------------------------------------
@@ -815,8 +814,8 @@ app.post("/api/scores", async (req, res) => {
         updated: new Date().toISOString(),
       });
 
-      await saveScores(jjpScores);
-      await mergeAllTime(machineId, scores, {
+      saveScores(jjpScores);
+      mergeAllTime(machineId, scores, {
         display_name: body.game || existing.game || "Unknown",
         manufacturer: body.manufacturer || existing.manufacturer || "Jersey Jack Pinball",
       });
@@ -864,9 +863,9 @@ app.put("/api/scores/:machineId", async (req, res) => {
       existing.updated = new Date().toISOString();
 
       jjpScores.set(machineId, existing);
-      await saveScores(jjpScores);
+      saveScores(jjpScores);
       if (existing.scores) {
-        await mergeAllTime(machineId, existing.scores, {
+        mergeAllTime(machineId, existing.scores, {
           display_name: existing.game || machineId,
           manufacturer: existing.manufacturer || "Jersey Jack Pinball",
         });
