@@ -25,7 +25,13 @@ copyDir(path.join(src, "static"), path.join(dest, "static"));
 // Copy PWA files
 console.log("Copying PWA files...");
 fs.copyFileSync(path.join(src, "manifest.json"), path.join(dest, "manifest.json"));
-fs.copyFileSync(path.join(src, "sw.js"), path.join(dest, "sw.js"));
+
+// Copy and version-stamp service worker for cache busting
+const buildVersion = 'utg-' + Date.now();
+let sw = fs.readFileSync(path.join(src, "sw.js"), "utf8");
+sw = sw.replace(/const CACHE_NAME = '[^']+';/, `const CACHE_NAME = '${buildVersion}';`);
+fs.writeFileSync(path.join(dest, "sw.js"), sw);
+console.log(`  SW cache version: ${buildVersion}`);
 
 // Read and patch index.html
 console.log("Patching index.html for public site...");

@@ -21,10 +21,10 @@ module.exports = async function (context, req) {
 
   try {
     const data = req.body;
-    if (!data || !data.games) {
+    if (!data || typeof data !== 'object' || !data.games || typeof data.games !== 'object') {
       context.res = {
         status: 400,
-        body: JSON.stringify({ error: "Missing games data" }),
+        body: JSON.stringify({ error: "Missing or invalid games data" }),
       };
       return;
     }
@@ -41,9 +41,10 @@ module.exports = async function (context, req) {
       }),
     };
   } catch (err) {
+    console.error("Push scores error:", err);
     context.res = {
       status: 500,
-      body: JSON.stringify({ error: "Failed to process score data" }),
+      body: JSON.stringify({ error: "Failed to process score data: " + err.message }),
     };
   }
 };

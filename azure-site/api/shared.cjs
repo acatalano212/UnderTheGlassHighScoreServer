@@ -39,21 +39,18 @@ module.exports = {
   },
 
   async setScores(data) {
-    scoreData = {
+    const toStore = {
       ...data,
       _pushed_at: new Date().toISOString(),
     };
-    try {
-      const client = getBlobClient();
-      if (client) {
-        const json = JSON.stringify(scoreData);
-        await client.upload(json, json.length, {
-          overwrite: true,
-          blobHTTPHeaders: { blobContentType: "application/json" },
-        });
-      }
-    } catch (err) {
-      console.error("Blob write error:", err.message);
+    scoreData = toStore;
+    const client = getBlobClient();
+    if (client) {
+      const json = JSON.stringify(toStore);
+      await client.upload(json, json.length, {
+        overwrite: true,
+        blobHTTPHeaders: { blobContentType: "application/json" },
+      });
     }
   },
 };

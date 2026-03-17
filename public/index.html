@@ -694,7 +694,16 @@ body{
 // looks identical at 1080p, 1440p, 2160p, or any resolution.
 (function(){
   var z = screen.width / 1920;
-  if (z > 1) document.documentElement.style.zoom = z;
+  if (z > 1) {
+    if ('zoom' in document.documentElement.style) {
+      document.documentElement.style.zoom = z;
+    } else {
+      // Firefox fallback: use CSS transform
+      document.documentElement.style.transformOrigin = 'top left';
+      document.documentElement.style.transform = 'scale(' + z + ')';
+      document.documentElement.style.width = (100 / z) + '%';
+    }
+  }
 })();
 
 // JJP game config — artwork and logos for known JJP titles

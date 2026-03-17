@@ -383,7 +383,15 @@ body{
 // Zoom scaling for high-res displays (same as dashboard)
 (function(){
   var z = screen.width / 1920;
-  if (z > 1) document.documentElement.style.zoom = z;
+  if (z > 1) {
+    if ('zoom' in document.documentElement.style) {
+      document.documentElement.style.zoom = z;
+    } else {
+      document.documentElement.style.transformOrigin = 'top left';
+      document.documentElement.style.transform = 'scale(' + z + ')';
+      document.documentElement.style.width = (100 / z) + '%';
+    }
+  }
 })();
 </script>
 </head>

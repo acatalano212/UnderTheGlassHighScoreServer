@@ -1,5 +1,6 @@
 // Under the Glass – Service Worker
-const CACHE_NAME = 'utg-v1';
+// CACHE_VERSION is updated by build-azure.cjs on deploy
+const CACHE_NAME = 'utg-v2';
 
 // Static assets to cache on install
 const PRECACHE = [
