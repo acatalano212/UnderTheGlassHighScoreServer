@@ -1316,7 +1316,8 @@ function escapeHtml(str) {
 
 function sanitizeUrl(url) {
   if (!url || typeof url !== 'string') return '';
-  if (/^(https?:\/\/|\/static\/|\/)/i.test(url)) return url.replace(/['"()<>]/g, '');
+  // Allow relative paths (static/...), absolute paths (/...), and http(s) URLs
+  if (/^(https?:\/\/|\/|static\/|[a-zA-Z0-9])/i.test(url)) return url.replace(/['"<>]/g, '');
   return '';
 }
 
