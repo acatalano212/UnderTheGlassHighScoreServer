@@ -504,20 +504,27 @@ let apiKey = '';
 let allGames = {};
 let selectedGame = null;
 
+function escapeHtml(str) {
+  if (str == null) return '';
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
 function getInitials(name) {
   if (!name) return '??';
-  const parts = name.trim().split(/[\s._-]+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+  const parts = name.trim().split(/[\s._-]+/).filter(Boolean);
+  if (parts.length >= 2 && parts[0].length > 0 && parts[parts.length-1].length > 0) return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
   return name.substring(0, 2).toUpperCase();
 }
-function formatScore(n) { return Number(n).toLocaleString('en-US'); }
+function formatScore(n) { if (n == null || isNaN(n)) return '0'; return Number(n).toLocaleString('en-US'); }
 function parseScoreInput(str) { return parseInt(String(str).replace(/[^0-9]/g, '')) || 0; }
 
 function logoHtml(key, name, size, rClass, fallbackLogo) {
   const logo = GAME_LOGOS[key] || fallbackLogo;
   const theme = GAME_THEMES[key] || DEFAULT_THEME;
-  if (logo) return `<img class="${rClass}" src="${logo}" alt="" style="width:${size}px;height:${size}px">`;
-  return `<div class="${rClass}" style="width:${size}px;height:${size}px;background:${theme.colors[0]}">${getInitials(name)}</div>`;
+  if (logo) return `<img class="${rClass}" src="${escapeHtml(logo)}" alt="" style="width:${size}px;height:${size}px">`;
+  return `<div class="${rClass}" style="width:${size}px;height:${size}px;background:${theme.colors[0]}">${escapeHtml(getInitials(name))}</div>`;
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────
@@ -593,8 +600,8 @@ function renderSidebar() {
     item.innerHTML = `
       ${logoHtml(key, game.display_name, 36, gameLogo ? 'gi-logo' : 'gi-fallback', game.square_logo)}
       <div class="gi-info">
-        <div class="gi-name">${game.display_name}</div>
-        <div class="gi-sub">${sub}</div>
+        <div class="gi-name">${escapeHtml(game.display_name)}</div>
+        <div class="gi-sub">${escapeHtml(sub)}</div>
       </div>
       ${isStern ? '<span class="gi-badge">API</span>' : ''}
     `;
@@ -628,8 +635,8 @@ function renderGameSelector() {
       lastSection = section;
     }
     const sub = [game.manufacturer || '', game.edition || ''].filter(Boolean).join(' · ');
-    const label = game.display_name + (sub ? ` — ${sub}` : '') + (isStern ? ' 🔒' : '');
-    html += `<option value="${key}" ${isStern ? 'disabled' : ''}>${label}</option>`;
+    const label = escapeHtml(game.display_name) + (sub ? ` — ${escapeHtml(sub)}` : '') + (isStern ? ' 🔒' : '');
+    html += `<option value="${escapeHtml(key)}" ${isStern ? 'disabled' : ''}>${label}</option>`;
   }
   if (lastSection) html += '</optgroup>';
 
@@ -860,19 +867,19 @@ function activityTypeLabel(type) {
 function activityDetail(entry) {
   switch (entry.type) {
     case 'xiao_score':
-      return `<strong>${entry.game}</strong> — ${entry.scoreCount} scores (top: ${(entry.topScore||0).toLocaleString()}) from ${entry.ip}`;
+      return `<strong>${escapeHtml(entry.game)}</strong> — ${escapeHtml(String(entry.scoreCount))} scores (top: ${(entry.topScore||0).toLocaleString()}) from ${escapeHtml(entry.ip)}`;
     case 'stern_fetch':
       return entry.status === 'ok'
-        ? `Refreshed ${entry.gameCount} game(s) from Stern API`
-        : `<span style="color:#f85149">Error: ${entry.error}</span>`;
+        ? `Refreshed ${escapeHtml(String(entry.gameCount))} game(s) from Stern API`
+        : `<span style="color:#f85149">Error: ${escapeHtml(entry.error)}</span>`;
     case 'admin_edit':
-      return `<strong>${entry.game}</strong> scores edited from ${entry.ip}`;
+      return `<strong>${escapeHtml(entry.game)}</strong> scores edited from ${escapeHtml(entry.ip)}`;
     case 'config_change':
-      return `Settings updated (${(entry.changes||[]).join(', ')}) from ${entry.ip}`;
+      return `Settings updated (${escapeHtml((entry.changes||[]).join(', '))}) from ${escapeHtml(entry.ip)}`;
     case 'server_start':
-      return `Server started on port ${entry.port}`;
+      return `Server started on port ${escapeHtml(String(entry.port))}`;
     default:
-      return JSON.stringify(entry);
+      return escapeHtml(JSON.stringify(entry));
   }
 }
 
@@ -1024,9 +1031,9 @@ async function scanWifi() {
       li.className = 'wifi-net';
       li.innerHTML = `
         <div class="wn-bars">${signalBars(net.signal)}</div>
-        <div class="wn-ssid">${net.ssid}</div>
-        <div class="wn-security">${net.security || 'Open'}</div>
-        <div class="wn-signal">${net.signal}%</div>
+        <div class="wn-ssid">${escapeHtml(net.ssid)}</div>
+        <div class="wn-security">${escapeHtml(net.security || 'Open')}</div>
+        <div class="wn-signal">${escapeHtml(String(net.signal))}%</div>
       `;
       li.onclick = () => showWifiPassword(net.ssid, net.security);
       list.appendChild(li);
@@ -1034,7 +1041,7 @@ async function scanWifi() {
     el.innerHTML = '';
     el.appendChild(list);
   } catch (e) {
-    el.innerHTML = `<div class="scan-spinner">Scan failed: ${e.message}</div>`;
+    el.innerHTML = `<div class="scan-spinner">Scan failed: ${escapeHtml(e.message)}</div>`;
   }
 }
 
@@ -1044,14 +1051,15 @@ function showWifiPassword(ssid, security) {
   const needsPw = security && security !== 'Open' && security !== '--';
   area.innerHTML = `
     <div class="wifi-pw-modal">
-      <label>Connect to: <strong>${ssid}</strong></label>
+      <label>Connect to: <strong>${escapeHtml(ssid)}</strong></label>
       ${needsPw ? '<label style="margin-top:.5rem">Password</label><input type="password" id="wifiPwInput" placeholder="Network password" autofocus>' : ''}
       <div class="wifi-pw-actions">
         <button class="btn btn-secondary" onclick="document.getElementById('wifiPasswordArea').innerHTML=''">Cancel</button>
-        <button class="btn btn-primary" onclick="connectWifi('${ssid.replace(/'/g, "\\'")}')">Connect</button>
+        <button class="btn btn-primary" id="wifiConnectBtn">Connect</button>
       </div>
     </div>
   `;
+  document.getElementById('wifiConnectBtn').onclick = () => connectWifi(ssid);
   if (needsPw) document.getElementById('wifiPwInput')?.focus();
 }
 
@@ -1095,10 +1103,13 @@ async function loadSavedNetworks() {
     }
     el.innerHTML = networks.map(n => `
       <div class="saved-net">
-        <span class="sn-name">${n}</span>
-        <button class="sn-forget" onclick="forgetNetwork('${n.replace(/'/g, "\\'")}')">Forget</button>
+        <span class="sn-name">${escapeHtml(n)}</span>
+        <button class="sn-forget" data-ssid="${escapeHtml(n)}">Forget</button>
       </div>
     `).join('');
+    el.querySelectorAll('.sn-forget').forEach(btn => {
+      btn.onclick = () => forgetNetwork(btn.dataset.ssid);
+    });
   } catch {
     el.innerHTML = '<div class="scan-spinner">Could not load saved networks</div>';
   }
@@ -1121,10 +1132,10 @@ async function loadSystemInfo() {
     const resp = await fetch('/api/system');
     const data = await resp.json();
     el.innerHTML = `
-      <div class="si-label">Uptime</div><div class="si-value">${data.uptime || 'N/A'}</div>
-      <div class="si-label">Temperature</div><div class="si-value">${data.temperature || 'N/A'}</div>
-      <div class="si-label">Memory</div><div class="si-value">${data.memory || 'N/A'}</div>
-      <div class="si-label">Node.js</div><div class="si-value">${data.nodeVersion || 'N/A'}</div>
+      <div class="si-label">Uptime</div><div class="si-value">${escapeHtml(data.uptime || 'N/A')}</div>
+      <div class="si-label">Temperature</div><div class="si-value">${escapeHtml(data.temperature || 'N/A')}</div>
+      <div class="si-label">Memory</div><div class="si-value">${escapeHtml(data.memory || 'N/A')}</div>
+      <div class="si-label">Node.js</div><div class="si-value">${escapeHtml(data.nodeVersion || 'N/A')}</div>
     `;
   } catch {
     el.innerHTML = '<div class="si-label">Error</div><div class="si-value">Could not load system info</div>';

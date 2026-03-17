@@ -33,8 +33,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // API calls and HTML: network first, fall back to cache
-  if (url.pathname.startsWith('/api/') || event.request.mode === 'navigate') {
+  // API calls and HTML: network first, fall back to cache (GET only)
+  if ((url.pathname.startsWith('/api/') || event.request.mode === 'navigate') && event.request.method === 'GET') {
     event.respondWith(
       fetch(event.request)
         .then((resp) => {
@@ -44,6 +44,12 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => caches.match(event.request))
     );
+    return;
+  }
+
+  // Non-GET API calls: always go to network, no caching
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(event.request));
     return;
   }
 

@@ -29,6 +29,19 @@ module.exports = async function (context, req) {
       return;
     }
 
+    // Size limits to prevent abuse
+    const gameKeys = Object.keys(data.games);
+    if (gameKeys.length > 50) {
+      context.res = { status: 400, body: JSON.stringify({ error: "Too many games (max 50)" }) };
+      return;
+    }
+    for (const key of gameKeys) {
+      if (data.games[key]?.scores?.length > 100) {
+        context.res = { status: 400, body: JSON.stringify({ error: `Too many scores for ${key} (max 100)` }) };
+        return;
+      }
+    }
+
     await shared.setScores(data);
 
     context.res = {

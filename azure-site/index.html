@@ -1301,12 +1301,14 @@ function getInitials(username) {
 }
 
 function formatScore(n) {
-  return n.toLocaleString('en-US');
+  if (n == null || isNaN(n)) return '0';
+  return Number(n).toLocaleString('en-US');
 }
 
 function escapeHtml(str) {
+  if (str == null) return '';
   const div = document.createElement('div');
-  div.textContent = str;
+  div.textContent = String(str);
   return div.innerHTML;
 }
 
@@ -1370,11 +1372,13 @@ function renderCard(name, game) {
 }
 
 let carouselTimer = null;
+let carouselFadeTimer = null;
 let currentPage = 0;
 let totalPages = 0;
 let allGamesData = {}; // store for detail view
 let displayMode = 'monthly'; // monthly | alltime | detail-cycle
 let detailCycleTimer = null;
+let detailFadeTimer = null;
 let detailCycleIndex = 0;
 let sortedGameKeys = [];
 
@@ -1393,18 +1397,23 @@ function showPage(pageIndex) {
 
   // Fade out
   container.classList.add('fading');
-  setTimeout(() => {
-    // Swap pages while hidden
+  if (carouselFadeTimer) clearTimeout(carouselFadeTimer);
+  carouselFadeTimer = setTimeout(() => {
+    carouselFadeTimer = null;
     pages.forEach((p, i) => p.classList.toggle('active', i === pageIndex));
     dots.forEach((d, i) => d.classList.toggle('active', i === pageIndex));
     currentPage = pageIndex;
-    // Fade back in
     container.classList.remove('fading');
   }, 400);
 }
 
+function stopCarousel() {
+  if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+  if (carouselFadeTimer) { clearTimeout(carouselFadeTimer); carouselFadeTimer = null; }
+}
+
 function startCarousel() {
-  if (carouselTimer) clearInterval(carouselTimer);
+  stopCarousel();
   if (totalPages <= 1) return;
   carouselTimer = setInterval(() => {
     const next = (currentPage + 1) % totalPages;
@@ -1545,8 +1554,10 @@ function showDetail(gameName, isAutoCycle) {
   // Last-updated footer
   if (game.updated) {
     const d = new Date(game.updated);
-    const ts = d.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true });
-    html += `<div class="detail-updated">Last Updated: ${ts}</div>`;
+    if (!isNaN(d.getTime())) {
+      const ts = d.toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true });
+      html += `<div class="detail-updated">Last Updated: ${ts}</div>`;
+    }
   }
 
   html += '</div>'; // end detail-scores-wrap
@@ -1668,6 +1679,7 @@ function hideDetail() {
 
 function stopDetailCycle() {
   if (detailCycleTimer) { clearInterval(detailCycleTimer); detailCycleTimer = null; }
+  if (detailFadeTimer) { clearTimeout(detailFadeTimer); detailFadeTimer = null; }
 }
 
 function startDetailCycle() {
@@ -1678,7 +1690,9 @@ function startDetailCycle() {
   detailCycleTimer = setInterval(() => {
     const detailView = document.getElementById('detail-view');
     detailView.classList.add('fading');
-    setTimeout(() => {
+    if (detailFadeTimer) clearTimeout(detailFadeTimer);
+    detailFadeTimer = setTimeout(() => {
+      detailFadeTimer = null;
       detailCycleIndex = (detailCycleIndex + 1) % sortedGameKeys.length;
       showDetail(sortedGameKeys[detailCycleIndex], true);
       detailView.classList.remove('fading');
@@ -1716,7 +1730,7 @@ async function loadDashboard() {
     if (displayMode === 'detail-cycle') {
       document.getElementById('carousel-container').style.display = 'none';
       document.getElementById('carousel-dots').style.display = 'none';
-      if (carouselTimer) { clearInterval(carouselTimer); carouselTimer = null; }
+      stopCarousel();
       // Only start cycle if not already running — preserve position across refreshes
       if (!detailCycleTimer) {
         startDetailCycle();
@@ -1785,8 +1799,9 @@ document.addEventListener('click', (e) => {
 });
 
 // Initial load + auto-refresh
+let refreshTimer = null;
 loadDashboard();
-setInterval(loadDashboard, 60000);
+refreshTimer = setInterval(loadDashboard, 60000);
 
 // Register service worker for PWA
 if ('serviceWorker' in navigator) {

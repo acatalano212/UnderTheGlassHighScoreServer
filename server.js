@@ -5,7 +5,8 @@
  */
 
 import express from "express";
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
+import { readFileSync, existsSync, mkdirSync, writeFileSync, renameSync, unlinkSync } from "fs";
+import { writeFile, rename, unlink } from "fs/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { exec, execFile } from "child_process";
@@ -69,7 +70,15 @@ function loadConfig() {
 }
 
 function saveConfig(cfg) {
-  writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2), "utf-8");
+  const tmp = CONFIG_FILE + ".tmp";
+  try {
+    writeFileSync(tmp, JSON.stringify(cfg, null, 2), "utf-8");
+    renameSync(tmp, CONFIG_FILE);
+  } catch (e) {
+    console.error("Failed to save config:", e.message);
+    try { unlinkSync(tmp); } catch {}
+    throw e;
+  }
 }
 
 let runtimeConfig = loadConfig();
@@ -92,9 +101,30 @@ function loadScores() {
   return new Map();
 }
 
-function saveScores(scoresMap) {
+// Async atomic write helper
+async function atomicWrite(filePath, data) {
+  const tmp = filePath + ".tmp";
+  try {
+    await writeFile(tmp, JSON.stringify(data, null, 2), "utf-8");
+    await rename(tmp, filePath);
+  } catch (e) {
+    console.error(`Failed to write ${filePath}:`, e.message);
+    try { await unlink(tmp); } catch {}
+    throw e;
+  }
+}
+
+// Simple write mutex to serialize score mutations
+let writeLock = Promise.resolve();
+function withWriteLock(fn) {
+  const next = writeLock.then(fn, fn);
+  writeLock = next.catch(() => {});
+  return next;
+}
+
+async function saveScores(scoresMap) {
   const obj = Object.fromEntries(scoresMap);
-  writeFileSync(SCORES_FILE, JSON.stringify(obj, null, 2), "utf-8");
+  await atomicWrite(SCORES_FILE, obj);
 }
 
 // ---------------------------------------------------------------------------
@@ -112,15 +142,15 @@ function loadAllTime() {
   return {};
 }
 
-function saveAllTime(data) {
-  writeFileSync(ALLTIME_FILE, JSON.stringify(data, null, 2), "utf-8");
+async function saveAllTime(data) {
+  await atomicWrite(ALLTIME_FILE, data);
 }
 
 let allTimeScores = loadAllTime();
 
 // Merge scores into all-time leaderboard for a game.
 // Keeps top 10 unique players by highest score ever seen.
-function mergeAllTime(gameKey, newScores, gameMeta) {
+async function mergeAllTime(gameKey, newScores, gameMeta) {
   const existing = allTimeScores[gameKey] || { scores: [] };
   const byPlayer = new Map();
 
@@ -153,10 +183,10 @@ function mergeAllTime(gameKey, newScores, gameMeta) {
     scores: sorted,
     updated: new Date().toISOString(),
   };
-  saveAllTime(allTimeScores);
+  await saveAllTime(allTimeScores);
 }
 
-const JJP_COLORS = ["#740001","#ae0001","#eeba30","#1a472a","#2a623d","#222f5b","#5d5d5d"];
+const JJP_COLORS= ["#740001","#ae0001","#eeba30","#1a472a","#2a623d","#222f5b","#5d5d5d"];
 
 // Initialize scores from file, seed if empty
 const jjpScores = loadScores();
@@ -172,7 +202,7 @@ if (Object.keys(allTimeScores).length === 0) {
   console.log("Seeded all-time scores to", ALLTIME_FILE);
 }
 
-function seedAllTimeData() {
+async function seedAllTimeData() {
   const fakeAllTime = {
     "jjp-hp-we": {
       display_name: "Harry Potter (Wizard Edition)", manufacturer: "Jersey Jack Pinball",
@@ -378,7 +408,7 @@ function seedAllTimeData() {
       updated: new Date().toISOString(),
     };
   }
-  saveAllTime(allTimeScores);
+  await saveAllTime(allTimeScores);
 }
 
 // ---------------------------------------------------------------------------
@@ -608,7 +638,7 @@ async function cachedGet(url, key) {
 
 async function loadSternData() {
   const eventCode = runtimeConfig.sternEventCode || process.env.STERN_EVENT_CODE || "VaTQ-MRMSP-uJe";
-  const lbUrl = `${STERN_LEADERBOARD_URL}?event_code=${eventCode}&event_state=current`;
+  const lbUrl = `${STERN_LEADERBOARD_URL}?event_code=${encodeURIComponent(eventCode)}&event_state=current`;
 
   const [lbJson, titlesJson] = await Promise.all([
     cachedGet(lbUrl, "stern_lb"),
@@ -735,7 +765,7 @@ app.get("/api/scores", async (req, res) => {
 });
 
 // POST /api/scores — receive score submissions (ESP32 or admin)
-app.post("/api/scores", (req, res) => {
+app.post("/api/scores", async (req, res) => {
   const apiKey = process.env.UTG_API_KEY || "";
   const providedKey = req.headers["x-api-key"] || "";
   if (!apiKey || providedKey !== apiKey) {
@@ -756,50 +786,59 @@ app.post("/api/scores", (req, res) => {
   for (const entry of highScores) {
     let initials = (entry.initials || "???").toUpperCase().trim();
     if (initials === "ANTHOY") initials = "ANTHONY";
+    const parsed = parseInt(entry.score);
+    if (isNaN(parsed) || parsed < 0) continue;
     if (!seen.has(initials)) {
       seen.add(initials);
       scores.push({
         username: initials,
         avatar_path: "",
         background_color_hex: defaultColors[scores.length % defaultColors.length],
-        score: parseInt(entry.score) || 0,
+        score: parsed,
         is_all_access: false,
       });
     }
   }
   scores.sort((a, b) => b.score - a.score);
 
-  const existing = jjpScores.get(machineId) || {};
-  jjpScores.set(machineId, {
-    game: body.game || existing.game || "Unknown",
-    manufacturer: body.manufacturer || existing.manufacturer || "",
-    edition: body.edition || existing.edition || "",
-    scores,
-    games_played: body.games_played || existing.games_played || 0,
-    primary_background: body.primary_background || existing.primary_background || "",
-    square_logo: body.square_logo || existing.square_logo || "",
-    updated: new Date().toISOString(),
-  });
+  try {
+    await withWriteLock(async () => {
+      const existing = jjpScores.get(machineId) || {};
+      jjpScores.set(machineId, {
+        game: body.game || existing.game || "Unknown",
+        manufacturer: body.manufacturer || existing.manufacturer || "",
+        edition: body.edition || existing.edition || "",
+        scores,
+        games_played: body.games_played || existing.games_played || 0,
+        primary_background: body.primary_background || existing.primary_background || "",
+        square_logo: body.square_logo || existing.square_logo || "",
+        updated: new Date().toISOString(),
+      });
 
-  saveScores(jjpScores);
-  mergeAllTime(machineId, scores, {
-    display_name: body.game || existing.game || "Unknown",
-    manufacturer: body.manufacturer || existing.manufacturer || "Jersey Jack Pinball",
-  });
-  logActivity("xiao_score", {
-    game: body.game || "Unknown",
-    machineId,
-    ip: req.ip,
-    scoreCount: scores.length,
-    topScore: scores[0]?.score || 0,
-  });
-  console.log(`Updated scores for ${machineId}: ${scores.length} entries`);
+      await saveScores(jjpScores);
+      await mergeAllTime(machineId, scores, {
+        display_name: body.game || existing.game || "Unknown",
+        manufacturer: body.manufacturer || existing.manufacturer || "Jersey Jack Pinball",
+      });
+    });
 
-  res.json({ status: "ok", machine_id: machineId, scores_count: scores.length });
+    logActivity("xiao_score", {
+      game: body.game || "Unknown",
+      machineId,
+      ip: req.ip,
+      scoreCount: scores.length,
+      topScore: scores[0]?.score || 0,
+    });
+    console.log(`Updated scores for ${machineId}: ${scores.length} entries`);
+    res.json({ status: "ok", machine_id: machineId, scores_count: scores.length });
+  } catch (e) {
+    console.error("Failed to save scores:", e);
+    res.status(500).json({ error: "Failed to save scores" });
+  }
 });
 
 // PUT /api/scores/:machineId — admin update scores for a specific game
-app.put("/api/scores/:machineId", (req, res) => {
+app.put("/api/scores/:machineId", async (req, res) => {
   const apiKey = process.env.UTG_API_KEY || "";
   const providedKey = req.headers["x-api-key"] || "";
   if (!apiKey || providedKey !== apiKey) {
@@ -807,35 +846,44 @@ app.put("/api/scores/:machineId", (req, res) => {
   }
 
   const { machineId } = req.params;
-  const existing = jjpScores.get(machineId);
-  if (!existing) {
-    return res.status(404).json({ error: "Game not found" });
-  }
 
-  const body = req.body;
-  if (body.scores) {
-    existing.scores = body.scores;
-  }
-  if (body.games_played !== undefined) {
-    existing.games_played = body.games_played;
-  }
-  existing.updated = new Date().toISOString();
+  try {
+    await withWriteLock(async () => {
+      const existing = jjpScores.get(machineId);
+      if (!existing) {
+        throw Object.assign(new Error("Game not found"), { statusCode: 404 });
+      }
 
-  jjpScores.set(machineId, existing);
-  saveScores(jjpScores);
-  if (existing.scores) {
-    mergeAllTime(machineId, existing.scores, {
-      display_name: existing.game || machineId,
-      manufacturer: existing.manufacturer || "Jersey Jack Pinball",
+      const body = req.body;
+      if (body.scores) {
+        existing.scores = body.scores;
+      }
+      if (body.games_played !== undefined) {
+        existing.games_played = body.games_played;
+      }
+      existing.updated = new Date().toISOString();
+
+      jjpScores.set(machineId, existing);
+      await saveScores(jjpScores);
+      if (existing.scores) {
+        await mergeAllTime(machineId, existing.scores, {
+          display_name: existing.game || machineId,
+          manufacturer: existing.manufacturer || "Jersey Jack Pinball",
+        });
+      }
     });
-  }
-  logActivity("admin_edit", {
-    game: existing.game || machineId,
-    machineId,
-    ip: req.ip,
-  });
 
-  res.json({ status: "ok", machine_id: machineId });
+    logActivity("admin_edit", {
+      game: jjpScores.get(machineId)?.game || machineId,
+      machineId,
+      ip: req.ip,
+    });
+    res.json({ status: "ok", machine_id: machineId });
+  } catch (e) {
+    if (e.statusCode === 404) return res.status(404).json({ error: "Game not found" });
+    console.error("Failed to update scores:", e);
+    res.status(500).json({ error: "Failed to save scores" });
+  }
 });
 
 // ---------------------------------------------------------------------------
@@ -870,7 +918,12 @@ app.put("/api/config", (req, res) => {
       runtimeConfig.displayMode = body.displayMode;
     }
   }
-  saveConfig(runtimeConfig);
+  try {
+    saveConfig(runtimeConfig);
+  } catch (e) {
+    console.error("Failed to save config:", e);
+    return res.status(500).json({ error: "Failed to save configuration" });
+  }
   logActivity("config_change", { ip: req.ip, changes: Object.keys(req.body) });
   res.json({ status: "ok", config: runtimeConfig });
 });
@@ -944,7 +997,7 @@ app.get("/api/wifi/scan", async (req, res) => {
     }
     res.json([...unique.values()].sort((a, b) => b.signal - a.signal));
   } catch (e) {
-    res.status(500).json({ error: "WiFi scan not available: " + e.message });
+    res.status(500).json({ error: "WiFi scan not available" });
   }
 });
 
@@ -966,7 +1019,8 @@ app.post("/api/wifi/connect", async (req, res) => {
     const ip = await execPromise("hostname -I").catch(() => "Unknown");
     res.json({ status: "connected", ssid, ip: ip.split(" ")[0] });
   } catch (e) {
-    res.status(500).json({ error: "Failed to connect: " + e.message });
+    console.error("WiFi connect failed:", e.message);
+    res.status(500).json({ error: "Failed to connect to network" });
   }
 });
 
@@ -980,7 +1034,8 @@ app.get("/api/wifi/saved", async (req, res) => {
       .map(([name]) => name);
     res.json(wifi);
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    console.error("Failed to list saved networks:", e.message);
+    res.status(500).json({ error: "Could not list saved networks" });
   }
 });
 
@@ -993,10 +1048,20 @@ app.delete("/api/wifi/:ssid", async (req, res) => {
   }
 
   try {
+    // Validate SSID exists in saved networks before deleting
+    const raw = await execPromise("nmcli -t -f NAME,TYPE connection show");
+    const saved = raw.split("\n").filter(Boolean)
+      .map((l) => l.split(":"))
+      .filter(([, type]) => type === "802-11-wireless")
+      .map(([name]) => name);
+    if (!saved.includes(req.params.ssid)) {
+      return res.status(404).json({ error: "Network not found" });
+    }
     await execFilePromise("nmcli", ["connection", "delete", req.params.ssid]);
     res.json({ status: "deleted", ssid: req.params.ssid });
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    console.error("WiFi delete failed:", e.message);
+    res.status(500).json({ error: "Failed to forget network" });
   }
 });
 
