@@ -515,6 +515,34 @@ body{
 /* ---------- Mobile tab toggle (hidden on desktop) ---------- */
 .lb-tabs{display:none}
 
+/* ---------- Tablet landscape (iPad) ---------- */
+@media(min-width:901px) and (max-width:1200px){
+  .detail-view{
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    max-height:none;
+  }
+  .detail-body{
+    grid-template-columns:1fr 30%;
+    height:auto;
+    overflow:visible;
+    gap:1rem;
+  }
+  .detail-machine{display:none !important}
+  .detail-center{
+    max-height:none;
+    overflow:visible;
+  }
+  .detail-about{
+    max-height:none;
+    overflow:visible;
+  }
+  .detail-header{height:160px}
+  .detail-header .game-logo{width:80px;height:80px}
+  .detail-header .title-text{font-size:2rem}
+  .detail-header .subtitle-text{font-size:1rem}
+}
+
 /* ---------- Mobile detail responsive ---------- */
 @media(max-width:900px){
   .detail-view{
