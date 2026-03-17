@@ -1,8 +1,11 @@
-// In-memory score cache (populated by push-scores, served to clients)
+// Score cache with blob storage fallback for persistence
 const shared = require("../shared.cjs");
 
 module.exports = async function (context, req) {
-  const data = shared.getScores();
+  let data = shared.getScores();
+  if (!data) {
+    data = await shared.loadFromBlob();
+  }
   if (!data) {
     context.res = {
       status: 503,

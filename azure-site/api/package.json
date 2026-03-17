@@ -2,5 +2,7 @@
   "name": "",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {}
+  "dependencies": {
+    "@azure/storage-blob": "^12.31.0"
+  }
 }

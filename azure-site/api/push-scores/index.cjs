@@ -29,7 +29,7 @@ module.exports = async function (context, req) {
       return;
     }
 
-    shared.setScores(data);
+    await shared.setScores(data);
 
     context.res = {
       status: 200,
