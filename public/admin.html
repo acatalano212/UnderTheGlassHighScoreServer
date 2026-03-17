@@ -1056,7 +1056,7 @@ async function connectWifi(ssid) {
     if (area) area.innerHTML = '<div class="scan-spinner">Connecting...</div>';
     const resp = await fetch('/api/wifi/connect', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
       body: JSON.stringify({ ssid, password }),
     });
     const data = await resp.json();
@@ -1098,7 +1098,7 @@ async function loadSavedNetworks() {
 
 async function forgetNetwork(ssid) {
   try {
-    await fetch('/api/wifi/' + encodeURIComponent(ssid), { method: 'DELETE' });
+    await fetch('/api/wifi/' + encodeURIComponent(ssid), { method: 'DELETE', headers: { 'x-api-key': apiKey } });
     showToast(`Forgot ${ssid}`);
     loadSavedNetworks();
   } catch (e) {
@@ -1140,7 +1140,7 @@ async function saveDisplayMode() {
   try {
     const resp = await fetch('/api/config', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
       body: JSON.stringify({ displayMode: el.value }),
     });
     if (resp.ok) {
@@ -1161,7 +1161,7 @@ async function saveSternCode() {
   try {
     const resp = await fetch('/api/config', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
       body: JSON.stringify({ sternEventCode: code }),
     });
     if (resp.ok) {

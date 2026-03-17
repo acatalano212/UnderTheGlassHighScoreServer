@@ -22,6 +22,11 @@ function copyDir(srcDir, destDir) {
 console.log("Copying static assets...");
 copyDir(path.join(src, "static"), path.join(dest, "static"));
 
+// Copy PWA files
+console.log("Copying PWA files...");
+fs.copyFileSync(path.join(src, "manifest.json"), path.join(dest, "manifest.json"));
+fs.copyFileSync(path.join(src, "sw.js"), path.join(dest, "sw.js"));
+
 // Read and patch index.html
 console.log("Patching index.html for public site...");
 let html = fs.readFileSync(path.join(src, "index.html"), "utf8");

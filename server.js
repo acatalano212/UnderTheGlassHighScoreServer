@@ -8,7 +8,7 @@ import express from "express";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
-import { exec } from "child_process";
+import { exec, execFile } from "child_process";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -800,6 +800,12 @@ app.post("/api/scores", (req, res) => {
 
 // PUT /api/scores/:machineId — admin update scores for a specific game
 app.put("/api/scores/:machineId", (req, res) => {
+  const apiKey = process.env.UTG_API_KEY || "";
+  const providedKey = req.headers["x-api-key"] || "";
+  if (!apiKey || providedKey !== apiKey) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   const { machineId } = req.params;
   const existing = jjpScores.get(machineId);
   if (!existing) {
@@ -846,6 +852,12 @@ app.get("/api/config", (req, res) => {
 
 // PUT /api/config — update runtime config
 app.put("/api/config", (req, res) => {
+  const apiKey = process.env.UTG_API_KEY || "";
+  const providedKey = req.headers["x-api-key"] || "";
+  if (!apiKey || providedKey !== apiKey) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   const body = req.body;
   if (body.sternEventCode !== undefined) {
     runtimeConfig.sternEventCode = body.sternEventCode.trim();
@@ -880,6 +892,15 @@ app.get("/api/activity", (req, res) => {
 function execPromise(cmd) {
   return new Promise((resolve, reject) => {
     exec(cmd, { timeout: 30_000 }, (err, stdout, stderr) => {
+      if (err) reject(new Error(stderr || err.message));
+      else resolve(stdout.trim());
+    });
+  });
+}
+
+function execFilePromise(file, args) {
+  return new Promise((resolve, reject) => {
+    execFile(file, args, { timeout: 30_000 }, (err, stdout, stderr) => {
       if (err) reject(new Error(stderr || err.message));
       else resolve(stdout.trim());
     });
@@ -929,14 +950,19 @@ app.get("/api/wifi/scan", async (req, res) => {
 
 // POST /api/wifi/connect — connect to a network
 app.post("/api/wifi/connect", async (req, res) => {
+  const apiKey = process.env.UTG_API_KEY || "";
+  const providedKey = req.headers["x-api-key"] || "";
+  if (!apiKey || providedKey !== apiKey) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   const { ssid, password } = req.body;
   if (!ssid) return res.status(400).json({ error: "SSID required" });
 
   try {
-    const cmd = password
-      ? `nmcli dev wifi connect "${ssid}" password "${password}"`
-      : `nmcli dev wifi connect "${ssid}"`;
-    await execPromise(cmd);
+    const args = ["dev", "wifi", "connect", ssid];
+    if (password) args.push("password", password);
+    await execFilePromise("nmcli", args);
     const ip = await execPromise("hostname -I").catch(() => "Unknown");
     res.json({ status: "connected", ssid, ip: ip.split(" ")[0] });
   } catch (e) {
@@ -960,8 +986,14 @@ app.get("/api/wifi/saved", async (req, res) => {
 
 // DELETE /api/wifi/:ssid — forget a saved network
 app.delete("/api/wifi/:ssid", async (req, res) => {
+  const apiKey = process.env.UTG_API_KEY || "";
+  const providedKey = req.headers["x-api-key"] || "";
+  if (!apiKey || providedKey !== apiKey) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   try {
-    await execPromise(`nmcli connection delete "${req.params.ssid}"`);
+    await execFilePromise("nmcli", ["connection", "delete", req.params.ssid]);
     res.json({ status: "deleted", ssid: req.params.ssid });
   } catch (e) {
     res.status(500).json({ error: e.message });
