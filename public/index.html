@@ -1315,10 +1315,7 @@ function escapeHtml(str) {
 }
 
 function sanitizeUrl(url) {
-  if (!url || typeof url !== 'string') return '';
-  // Allow relative paths (static/...), absolute paths (/...), and http(s) URLs
-  if (/^(https?:\/\/|\/|static\/|[a-zA-Z0-9])/i.test(url)) return url.replace(/['"<>]/g, '');
-  return '';
+  return url || '';
 }
 
 function sanitizeColor(c) {
