@@ -10,8 +10,8 @@ module.exports = async function (context, req) {
 
   // Verify API key
   const apiKey = req.headers["x-api-key"] || "";
-  const expectedKey = process.env.UTG_PUSH_KEY || "utg-default-key-change-me";
-  if (apiKey !== expectedKey) {
+  const expectedKey = process.env.UTG_PUSH_KEY || "";
+  if (!expectedKey || apiKey !== expectedKey) {
     context.res = {
       status: 401,
       body: JSON.stringify({ error: "Invalid API key" }),
