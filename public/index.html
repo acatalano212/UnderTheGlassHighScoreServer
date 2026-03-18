@@ -492,21 +492,42 @@ body{
   font-family:'Oswald',sans-serif;
   font-weight:700;
 }
-/* Side-by-side leaderboards */
+/* Side-by-side leaderboards — tab layout on all views */
+.lb-tabs{
+  display:flex;
+  gap:0;
+  border-bottom:2px solid rgba(255,255,255,.1);
+  margin:0 1rem;
+}
+.lb-tab{
+  flex:1;
+  text-align:center;
+  padding:.7rem 0;
+  font-size:1.1rem;
+  font-weight:700;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  cursor:pointer;
+  color:#8b949e;
+  border-bottom:3px solid transparent;
+  margin-bottom:-2px;
+  transition:color .2s, border-color .2s;
+  font-family:'Oswald',sans-serif;
+}
+.lb-tab.active-alltime{color:#f0c040;border-bottom-color:#f0c040}
+.lb-tab.active-monthly{color:#58a6ff;border-bottom-color:#58a6ff}
 .lb-columns{
-  display:flex;gap:1.2rem;padding:0.8rem 1rem 0;
+  flex-direction:column;
+  padding:0.8rem 1rem 0;
+  gap:0;
+  display:flex;
 }
 .lb-column{
   flex:1;min-width:0;
+  display:none;
 }
-.lb-column-title{
-  font-size:1.1rem;font-weight:700;text-transform:uppercase;
-  letter-spacing:.12em;color:#e6edf3;text-align:center;
-  padding:.6rem 0;border-bottom:2px solid rgba(255,255,255,.1);
-  margin-bottom:.2rem;
-}
-.lb-column-title.alltime{color:#f0c040}
-.lb-column-title.monthly{color:#58a6ff}
+.lb-column.lb-col-active{display:block}
+.lb-column-title{display:none}
 .lb-gc-row{
   background:linear-gradient(90deg,rgba(240,192,64,.08),rgba(240,192,64,.02));
   border-bottom:1px solid rgba(240,192,64,.15);
@@ -519,8 +540,6 @@ body{
   color:#f0c040;opacity:.7;
 }
 
-/* ---------- Mobile tab toggle (hidden on desktop) ---------- */
-.lb-tabs{display:none}
 
 /* ---------- Tablet landscape (iPad) ---------- */
 @media(min-width:901px) and (max-width:1200px){
@@ -592,39 +611,14 @@ body{
   .detail-header .mfg-logo{
     display:none !important;
   }
-  /* Tab toggle visible on mobile */
-  .lb-tabs{
-    display:flex;
-    gap:0;
-    border-bottom:2px solid rgba(255,255,255,.1);
-    margin:0 1rem;
-  }
+  /* Tab toggle — just adjust sizing for mobile */
   .lb-tab{
-    flex:1;
-    text-align:center;
-    padding:.7rem 0;
     font-size:1rem;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.1em;
-    cursor:pointer;
-    color:#8b949e;
-    border-bottom:3px solid transparent;
-    margin-bottom:-2px;
-    transition:color .2s, border-color .2s;
-    font-family:'Oswald',sans-serif;
+    padding:.6rem 0;
   }
-  .lb-tab.active-alltime{color:#f0c040;border-bottom-color:#f0c040}
-  .lb-tab.active-monthly{color:#58a6ff;border-bottom-color:#58a6ff}
-  /* Hide column titles on mobile since tabs replace them */
   .lb-columns{
-    flex-direction:column;
     padding:0.5rem .5rem 0;
-    gap:0;
   }
-  .lb-column{display:none}
-  .lb-column.lb-col-active{display:block}
-  .lb-column-title{display:none}
   /* Scores sizing for mobile */
   .detail-scores .score-row{
     padding:.5rem .8rem;
@@ -1539,25 +1533,23 @@ function showDetail(gameName, isAutoCycle) {
   const now = new Date();
   const monthLabel = now.toLocaleString('en-US', { month: 'long' });
 
-  // Side-by-side leaderboards (tabs for mobile)
+  // Tab leaderboards
   html += '<div class="lb-tabs">';
-  html += '<div class="lb-tab active-alltime" data-col="alltime" onclick="switchLbTab(this)">All Time</div>';
-  html += `<div class="lb-tab" data-col="monthly" onclick="switchLbTab(this)">${monthLabel}</div>`;
+  html += '<div class="lb-tab active-alltime" data-col="alltime" onclick="switchLbTab(this)">All Time Top 20</div>';
+  html += `<div class="lb-tab" data-col="monthly" onclick="switchLbTab(this)">${monthLabel} Top 20</div>`;
   html += '</div>';
   html += '<div class="lb-columns">';
 
   // All Time column
   html += '<div class="lb-column lb-col-active" id="lb-col-alltime">';
-  html += '<div class="lb-column-title alltime">All Time</div>';
   html += '<div class="detail-scores">';
-  html += buildScoreRows(game.alltime_scores || game.scores, 11);
+  html += buildScoreRows(game.alltime_scores || game.scores, 20);
   html += '</div></div>';
 
   // Current Month column
   html += '<div class="lb-column" id="lb-col-monthly">';
-  html += `<div class="lb-column-title monthly">${monthLabel}</div>`;
   html += '<div class="detail-scores">';
-  html += buildScoreRows(game.scores, 11, false);
+  html += buildScoreRows(game.scores, 20, false);
   html += '</div></div>';
 
   html += '</div>'; // end lb-columns
