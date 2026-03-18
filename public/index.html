@@ -528,6 +528,45 @@ body{
 }
 .lb-column.lb-col-active{display:block}
 .lb-column-title{display:none}
+/* Grand Champion banner — spans full width above 2 columns */
+.gc-banner{
+  display:flex;align-items:center;gap:1rem;
+  padding:.6rem 1.5rem;
+  background:linear-gradient(90deg,rgba(240,192,64,.12),rgba(240,192,64,.04),rgba(240,192,64,.12));
+  border:1px solid rgba(240,192,64,.25);
+  border-radius:8px;
+  margin-bottom:.5rem;
+  position:relative;
+  overflow:hidden;
+}
+.gc-banner::before{
+  content:'🏆';position:absolute;left:8px;top:50%;transform:translateY(-50%);
+  font-size:1.6rem;opacity:.25;
+}
+.gc-banner::after{
+  content:'🏆';position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  font-size:1.6rem;opacity:.25;
+}
+.gc-banner .gc-title{
+  font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;
+  color:#f0c040;flex-shrink:0;min-width:120px;
+}
+.gc-banner .avatar{
+  width:38px;height:38px;font-size:.9rem;flex-shrink:0;
+}
+.gc-banner .username{
+  flex:1;font-size:1.1rem;font-weight:700;letter-spacing:.05em;
+}
+.gc-banner .score-val{
+  font-size:1.1rem;font-weight:700;color:#f0c040;
+}
+/* Two-column score grid */
+.lb-two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0 1.2rem;
+}
+.lb-two-col .lb-half{min-width:0}
 .lb-gc-row{
   background:linear-gradient(90deg,rgba(240,192,64,.08),rgba(240,192,64,.02));
   border-bottom:1px solid rgba(240,192,64,.15);
@@ -613,12 +652,25 @@ body{
   }
   /* Tab toggle — just adjust sizing for mobile */
   .lb-tab{
-    font-size:1rem;
+    font-size:.85rem;
     padding:.6rem 0;
+    letter-spacing:.05em;
   }
   .lb-columns{
     padding:0.5rem .5rem 0;
   }
+  .lb-two-col{
+    grid-template-columns:1fr;
+    gap:0;
+  }
+  .gc-banner{
+    padding:.5rem 1rem;
+    gap:.6rem;
+  }
+  .gc-banner .gc-title{
+    font-size:.6rem;min-width:auto;
+  }
+  .gc-banner::before,.gc-banner::after{font-size:1.2rem}
   /* Scores sizing for mobile */
   .detail-scores .score-row{
     padding:.5rem .8rem;
@@ -1505,29 +1557,58 @@ function showDetail(gameName, isAutoCycle) {
 
   // Build score rows helper
   const theme = getTheme(name);
-  function buildScoreRows(scoreList, limit, showGC = true) {
-    let rows = '';
-    const sl = (scoreList || []).slice(0, limit || 11);
-    sl.forEach((s, i) => {
-      const allAccess = s.is_all_access ? ' all-access' : '';
-      const isGC = showGC && i === 0;
-      const gcClass = isGC ? ' lb-gc-row' : '';
-      const color = isJjp ? theme.colors[i % theme.colors.length] : sanitizeColor(s.background_color_hex);
-      const avatarContent = s.avatar_path
-        ? `<img src="${sanitizeUrl(s.avatar_path)}" alt="${escapeHtml(s.username)}">`
-        : getInitials(s.username);
-      const rankLabel = isGC
-        ? '<span class="lb-gc-label">GC</span>'
-        : `${showGC ? i : i + 1}`;
-      rows += `<div class="score-row${allAccess}${gcClass}">`;
-      rows += `<span class="rank-num">${rankLabel}</span>`;
-      rows += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
-      rows += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
-      rows += `<span class="score-val">${formatScore(s.score)}</span>`;
-      rows += '</div>';
-    });
-    if (sl.length === 0) rows = '<div style="text-align:center;color:#484f58;padding:1.5rem;font-style:italic">No scores yet</div>';
-    return rows;
+  function buildScoreRow(s, i, showGC) {
+    const allAccess = s.is_all_access ? ' all-access' : '';
+    const color = isJjp ? theme.colors[i % theme.colors.length] : sanitizeColor(s.background_color_hex);
+    const avatarContent = s.avatar_path
+      ? `<img src="${sanitizeUrl(s.avatar_path)}" alt="${escapeHtml(s.username)}">`
+      : getInitials(s.username);
+    const rankLabel = `${showGC ? i : i + 1}`;
+    let row = `<div class="score-row${allAccess}">`;
+    row += `<span class="rank-num">${rankLabel}</span>`;
+    row += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
+    row += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
+    row += `<span class="score-val">${formatScore(s.score)}</span>`;
+    row += '</div>';
+    return row;
+  }
+
+  function buildGcBanner(s) {
+    if (!s) return '';
+    const color = isJjp ? theme.colors[0] : sanitizeColor(s.background_color_hex);
+    const avatarContent = s.avatar_path
+      ? `<img src="${sanitizeUrl(s.avatar_path)}" alt="${escapeHtml(s.username)}">`
+      : getInitials(s.username);
+    let html = '<div class="gc-banner">';
+    html += `<span class="gc-title">Grand Champion</span>`;
+    html += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
+    html += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
+    html += `<span class="score-val">${formatScore(s.score)}</span>`;
+    html += '</div>';
+    return html;
+  }
+
+  function buildTwoColScores(scoreList, showGC) {
+    const sl = (scoreList || []).slice(0, showGC ? 21 : 20);
+    if (sl.length === 0) return '<div style="text-align:center;color:#484f58;padding:1.5rem;font-style:italic">No scores yet</div>';
+    let html = '';
+    const startIdx = showGC ? 1 : 0;
+    if (showGC && sl.length > 0) {
+      html += buildGcBanner(sl[0]);
+    }
+    const remaining = sl.slice(startIdx);
+    const half = Math.ceil(remaining.length / 2);
+    const leftCol = remaining.slice(0, half);
+    const rightCol = remaining.slice(half);
+    html += '<div class="lb-two-col">';
+    html += '<div class="lb-half"><div class="detail-scores">';
+    leftCol.forEach((s, i) => { html += buildScoreRow(s, startIdx + i, showGC); });
+    html += '</div></div>';
+    html += '<div class="lb-half"><div class="detail-scores">';
+    rightCol.forEach((s, i) => { html += buildScoreRow(s, startIdx + half + i, showGC); });
+    html += '</div></div>';
+    html += '</div>';
+    return html;
   }
 
   const now = new Date();
@@ -1540,17 +1621,15 @@ function showDetail(gameName, isAutoCycle) {
   html += '</div>';
   html += '<div class="lb-columns">';
 
-  // All Time column
+  // All Time column (GC + 1-10 left, 11-20 right)
   html += '<div class="lb-column lb-col-active" id="lb-col-alltime">';
-  html += '<div class="detail-scores">';
-  html += buildScoreRows(game.alltime_scores || game.scores, 20);
-  html += '</div></div>';
+  html += buildTwoColScores(game.alltime_scores || game.scores, true);
+  html += '</div>';
 
-  // Current Month column
+  // Current Month column (1-10 left, 11-20 right, no GC)
   html += '<div class="lb-column" id="lb-col-monthly">';
-  html += '<div class="detail-scores">';
-  html += buildScoreRows(game.scores, 20, false);
-  html += '</div></div>';
+  html += buildTwoColScores(game.scores, false);
+  html += '</div>';
 
   html += '</div>'; // end lb-columns
 

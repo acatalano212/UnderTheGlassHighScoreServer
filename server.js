@@ -173,8 +173,8 @@ function mergeAllTime(gameKey, newScores, gameMeta) {
     }
   }
 
-  // Sort and keep top 20 (Grand Champion + 1-19)
-  const sorted = [...byPlayer.values()].sort((a, b) => b.score - a.score).slice(0, 20);
+  // Sort and keep top 21 (Grand Champion + 1-20)
+  const sorted = [...byPlayer.values()].sort((a, b) => b.score - a.score).slice(0, 21);
 
   allTimeScores[gameKey] = {
     display_name: gameMeta?.display_name || existing.display_name || gameKey,
