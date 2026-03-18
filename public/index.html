@@ -551,6 +551,7 @@ body{
   font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.2em;
   color:#f0c040;flex-shrink:0;min-width:120px;
 }
+.gc-banner .gc-title .gc-short{display:none}
 .gc-banner .avatar{
   width:38px;height:38px;font-size:.9rem;flex-shrink:0;
 }
@@ -670,6 +671,8 @@ body{
   .gc-banner .gc-title{
     font-size:.6rem;min-width:auto;
   }
+  .gc-banner .gc-title .gc-full{display:none}
+  .gc-banner .gc-title .gc-short{display:inline}
   .gc-banner::before,.gc-banner::after{font-size:1.2rem}
   /* Scores sizing for mobile */
   .detail-scores .score-row{
@@ -1580,7 +1583,7 @@ function showDetail(gameName, isAutoCycle) {
       ? `<img src="${sanitizeUrl(s.avatar_path)}" alt="${escapeHtml(s.username)}">`
       : getInitials(s.username);
     let html = '<div class="gc-banner">';
-    html += `<span class="gc-title">Grand Champion</span>`;
+    html += `<span class="gc-title"><span class="gc-full">Grand Champion</span><span class="gc-short">GC</span></span>`;
     html += `<span class="avatar" style="background:${color}">${avatarContent}</span>`;
     html += `<span class="username" style="color:${color}">${escapeHtml(s.username)}</span>`;
     html += `<span class="score-val">${formatScore(s.score)}</span>`;
