@@ -1439,6 +1439,7 @@ let allGamesData = {}; // store for detail view
 let displayMode = 'monthly'; // monthly | alltime | detail-cycle
 let detailCycleTimer = null;
 let detailFadeTimer = null;
+let detailTabTimer = null;
 let detailCycleIndex = 0;
 let sortedGameKeys = [];
 
@@ -1768,6 +1769,7 @@ function hideDetail() {
 function stopDetailCycle() {
   if (detailCycleTimer) { clearInterval(detailCycleTimer); detailCycleTimer = null; }
   if (detailFadeTimer) { clearTimeout(detailFadeTimer); detailFadeTimer = null; }
+  if (detailTabTimer) { clearTimeout(detailTabTimer); detailTabTimer = null; }
 }
 
 function startDetailCycle() {
@@ -1775,15 +1777,31 @@ function startDetailCycle() {
   if (sortedGameKeys.length === 0) return;
   detailCycleIndex = 0;
   showDetail(sortedGameKeys[0], true);
+
+  function scheduleTabSwitch() {
+    // After 5s on All Time, switch to Monthly
+    detailTabTimer = setTimeout(() => {
+      const monthlyTab = document.querySelector('[data-col="monthly"]');
+      if (monthlyTab) switchLbTab(monthlyTab);
+    }, 5000);
+  }
+
+  scheduleTabSwitch();
+
   detailCycleTimer = setInterval(() => {
     const detailView = document.getElementById('detail-view');
     detailView.classList.add('fading');
     if (detailFadeTimer) clearTimeout(detailFadeTimer);
+    if (detailTabTimer) { clearTimeout(detailTabTimer); detailTabTimer = null; }
     detailFadeTimer = setTimeout(() => {
       detailFadeTimer = null;
       detailCycleIndex = (detailCycleIndex + 1) % sortedGameKeys.length;
       showDetail(sortedGameKeys[detailCycleIndex], true);
       detailView.classList.remove('fading');
+      // Reset to All Time tab and schedule switch to Monthly
+      const alltimeTab = document.querySelector('[data-col="alltime"]');
+      if (alltimeTab) switchLbTab(alltimeTab);
+      scheduleTabSwitch();
     }, 500);
   }, 10000);
 }
